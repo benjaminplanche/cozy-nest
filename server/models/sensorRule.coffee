@@ -1,9 +1,9 @@
-##
+###
 # =================
 # SCHEMA - SensorRule
 # =================
 # Defines a SensorRule, defining the values interval of the Measures of a Sensor to trigger a Rule.
-##
+###
 
 cozydb = require 'cozydb'
 

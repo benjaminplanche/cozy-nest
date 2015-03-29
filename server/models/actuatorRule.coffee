@@ -1,9 +1,9 @@
-##
+###
 # =================
 # SCHEMA - ActuatorRule
 # =================
 # Defines a ActuatorRule, defining which Actuator must be triggered and how, when the conditions of the Rule (SensorRules) are met.
-##
+###
 
 cozydb = require 'cozydb'
 

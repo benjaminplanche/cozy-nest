@@ -1,9 +1,9 @@
-##
+###
 # =================
 # SCHEMA - Actuator
 # =================
 # Defines an Actuator, to apply Rules.
-##
+###
 
 cozydb = require 'cozydb'
 

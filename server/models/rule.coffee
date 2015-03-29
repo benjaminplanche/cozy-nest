@@ -1,9 +1,9 @@
-##
+###
 # =================
 # SCHEMA - Rule
 # =================
 # Defines a Rule, binding Sensors Measures and Actuators together.
-##
+###
 
 cozydb = require 'cozydb'
 
