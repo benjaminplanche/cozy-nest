@@ -1,7 +1,7 @@
 {
-  "author": "Your Name",
-  "name": "package-name",
-  "description": "Package description",
+  "author": "Benjamin (Bill) Planche",
+  "name": "cozy-nest",
+  "description": "Home Automation App for Cozy",
   "version": "0.0.1",
   "homepage": "",
   "repository": {
