@@ -1,30 +1,31 @@
 {
-  "name": "cozy-nest",
-  "version": "0.0.1",
+  "name": "cozy-template",
+  "version": "1.0.0",
   "engines": [
     "node = 0.10.x"
   ],
-  "description": "Home Automation App for Cozy",
+  "description": "A template project for cozy applications",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Aldream/cozy-nest"
+    "url": "https://github.com/cozy/cozy-template-coffee.git"
   },
-  "main": "server.js",
+  "main": "server.coffee",
   "dependencies": {
     "americano": "0.3.11",
     "cozydb": "0.0.3"
   },
   "devDependencies": {
-    "should": "2.0.1",
-    "mocha": "1.13.0",
-    "request-json": "0.4.4",
-    "cozy-fixtures": "1.0.1",
-    "jslint": "0.2.0"
+    "should": "4.0.1",
+    "mocha": "1.20.1",
+    "request-json": "0.4.10",
+    "cozy-fixtures": "1.1.1",
+    "coffeelint": "1.5.1",
+    "printit": "^0.1.3"
   },
   "scripts": {
     "test": "cake tests",
-    "start": "node server.js"
+    "start": "node build/server.js"
   },
   "cozy-permissions": {},
   "cozy-displayName": "Template"
