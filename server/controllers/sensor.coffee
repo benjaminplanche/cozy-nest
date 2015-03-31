@@ -28,7 +28,7 @@ module.exports.create = (req, res) ->
 
 module.exports.update = (req, res) ->
 	data = req.body
-	req.sensor.updateAttributes data, (err, sensor) ->
+	req.sensor.updateAttributesForDBAndDriver data, sensorsDrivers, (err, sensor) ->
 		if err?
 			res.send error: "Server error while saving sensor", 500
 		else

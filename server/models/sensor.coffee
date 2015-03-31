@@ -40,6 +40,40 @@ module.exports = SensorModel = cozydb.getModel 'Sensor',
 			return
 		return
 	
+	###
+	# updateAttributesForDBAndDriver
+	# ====
+	# Update data about the Sensor, both for the DB and Driver
+	# @param data (dictionary): 						New data
+	# @param sensorsDrivers (Driver[]): 				List of drivers supported by the system
+	# @param callback (Function(Error, Sensor):null):	Callback
+	###
+	# @todo Conver special case if "type" is changed -> Then the driver taking care of this device must be changed too!
+	@updateAttributesForDBAndDriver = (data, sensorsDrivers, callback) ->
+		prevData =
+			customId: @customId
+			name: @name
+			type: @type
+		# Update DB:
+		@updateAttributes data, (err, sensor) ->
+			if err
+				callback err, sensor
+				return
+			# Update Driver:	
+			sensorsDrivers[@type].update prevData.customId, data.customId, (err2) ->
+				if err2:
+					# Cancelling Modif:
+					@updateAttributes prevData, (err3, sensor2) ->
+						if err3
+							callback 'Can't update Sensor in Driver & Can't reverse update in DB. Contact Admin', sensor2
+							return
+						callback err2, sensor2
+						return
+				callback null, sensor
+				return
+			return
+		return
+	
 	
 	
 ###
