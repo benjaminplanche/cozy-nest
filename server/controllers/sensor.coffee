@@ -33,6 +33,14 @@ module.exports.create = (req, res) ->
 		else
 			res.send sensor, 201
 
+module.exports.createMeasure = (req, res) ->
+	data = req.body
+	req.sensor.createMeasure data, (err, measure) ->
+		if err
+			res.send error: "Server error while creating measure.", 500
+		else
+			res.send measure, 201
+
 module.exports.update = (req, res) ->
 	data = req.body
 	req.sensor.updateAttributesForDBAndDriver data, sensorsDrivers, (err, sensor) ->
