@@ -6,6 +6,7 @@
 ###
 
 cozydb = require 'cozydb'
+Measure = require './measure'
 
 module.exports = SensorModel = cozydb.getModel 'Sensor',
 	@schema:
@@ -43,7 +44,7 @@ module.exports = SensorModel = cozydb.getModel 'Sensor',
 	###
 	# updateAttributesForDBAndDriver
 	# ====
-	# Update data about the Sensor, both for the DB and Driver
+	# Updates data about the Sensor, both for the DB and Driver
 	# @param data (dictionary): 						New data
 	# @param sensorsDrivers (Driver[]): 				List of drivers supported by the system
 	# @param callback (Function(Error, Sensor):null):	Callback
@@ -75,6 +76,18 @@ module.exports = SensorModel = cozydb.getModel 'Sensor',
 		return
 	
 	
+	###
+	# createMeasure
+	# ====
+	# Generates a measure for this Sensor.
+	# @param data (dictionary): 						Measure's data (value, time, type)
+	# @param callback (Function(Measure):null):			Callback
+	###
+	@createMeasure = (data, callback) ->
+		sanitize data
+		data.sensorId = @id
+		measure = Measure.create data callback
+		
 	
 ###
 # byId
