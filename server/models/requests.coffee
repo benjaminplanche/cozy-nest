@@ -9,6 +9,9 @@ cozydb = require 'cozydb'
 
 byCustomIdAndType = (doc) -> emit [doc.customId, doc.type], doc
 byId: (doc) -> emit doc.id, doc
+bySensor: (doc) -> emit doc.sensorId, doc
+byActuator: (doc) -> emit doc.actuatorId, doc
+byRule: (doc) -> emit doc.ruleId, doc
 
 module.exports =
     sensor:
@@ -20,11 +23,27 @@ module.exports =
         all: cozydb.defaultRequests.all
 		byCustomIdAndType: byCustomIdAndType
 		byId: byId
-		
+	
 	measure:
         all: cozydb.defaultRequests.all
 		byId: byId
 		# @todo byDateAndSensor
+	
+	rule:
+        all: cozydb.defaultRequests.all
+		byId: byId
+	
+	sensorRule:
+        all: cozydb.defaultRequests.all
+		byId: byId
+		byRule: byRule
+		bySensor: bySensor
+	
+	actuatorRule:
+        all: cozydb.defaultRequests.all
+		byId: byId
+		byRule: byRule
+		byActuator: byActuator
 		
 	# # create all the requests you want!
 	# customRequest:
