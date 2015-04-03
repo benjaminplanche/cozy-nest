@@ -1,3 +1,10 @@
+###
+# =================
+# CONTROLLER - Actuator
+# =================
+# Operations on Actuators.
+###
+
 Actuator = require '../models/actuator'
 
 module.exports.fetch = (req, res, next, id) ->

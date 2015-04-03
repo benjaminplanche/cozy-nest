@@ -1,3 +1,10 @@
+###
+# =================
+# CONTROLLER - Sensor
+# =================
+# Operations on Sensors.
+###
+
 Sensor = require '../models/sensor'
 
 module.exports.fetch = (req, res, next, id) ->
