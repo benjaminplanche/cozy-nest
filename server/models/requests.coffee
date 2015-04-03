@@ -15,10 +15,20 @@ module.exports =
         all: cozydb.defaultRequests.all
 		byCustomIdAndType: byCustomIdAndType
 		byId: byId
+	
+	actuator:
+        all: cozydb.defaultRequests.all
+		byCustomIdAndType: byCustomIdAndType
+		byId: byId
 		
-        # # create all the requests you want!
-        # customRequest:
-            # map: (doc) ->
-                # # map function
-            # reduce: (key, values, rereduce) ->
-                # # non mandatory reduce function
+	measure:
+        all: cozydb.defaultRequests.all
+		byId: byId
+		# @todo byDateAndSensor
+		
+	# # create all the requests you want!
+	# customRequest:
+		# map: (doc) ->
+			# # map function
+		# reduce: (key, values, rereduce) ->
+			# # non mandatory reduce function
