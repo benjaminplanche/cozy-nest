@@ -132,7 +132,7 @@ SensorModel.getOrCreate = (data, callback) ->
 SensorModel.createIfDriver = (data, sensorsDrivers, callback) ->
 	if sensorsDrivers[type] # If this kind of device is supported:
 		# Check if this sensor isn't already added (the combination type + customId should be unique):
-		Sensor.getOrCreate data, (err, sensor, created, err) ->
+		Sensor.getOrCreate data, (err, sensor, created) ->
 			if err
 				callback err, sensor
 				return

@@ -118,7 +118,7 @@ ActuatorModel.getOrCreate = (data, callback) ->
 ActuatorModel.createIfDriver = (data, actuatorsDrivers, callback) ->
 	if actuatorsDrivers[type] # If this kind of device is supported:
 		# Check if this actuator isn't already added (the combination type + customId should be unique):
-		Actuator.getOrCreate data, (err, actuator, created, err) ->
+		Actuator.getOrCreate data, (err, actuator, created) ->
 			if err
 				callback err, actuator
 				return
