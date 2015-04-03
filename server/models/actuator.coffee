@@ -78,7 +78,7 @@ module.exports = ActuatorModel = cozydb.getModel 'Actuator',
 ###
 # byId
 # ====
-# Gets a Actuator using its ID.
+# Gets an Actuator using its ID.
 # @param id (ID): 							ID
 # @param callback (Function(Error, Actuator):null): 	Callback
 ###
@@ -90,30 +90,27 @@ ActuatorModel.byId = (id, callback) ->
 ###
 # getOrCreate
 # ====
-# Gets a Actuator, or creates it if not found.
-# @param data (Object): 							Data defining the actuator
-# @param callback (Function(Actuator, bool):null): 	Callback function. First parameter if the found or created Actuator; Second parameter is a boolean set true if created / false if found.
+# Gets an Actuator, or creates it if not found.
+# @param data (Object): 								Data defining the actuator
+# @param callback (Function(Error, Actuator, bool):null): Callback function. 2nd parameter is the found or created Actuator; 3rd parameter is a boolean set true if created / false if found.
 ###
 ActuatorModel.getOrCreate = (data, callback) ->
 	# customId + type is a primary key.
 	params = key: [accountID, type]
 	ActuatorModel.request "byCustomIdAndType", params, (err, actuators)->
 	if err
-		log.error err
-		callbackCreate = (actuator) ->
-			callback actuator, true
-		ActuatorModel.create data, callbackCreate
+		callback err, null, null
 	else if actuators.length is 0
-		callbackCreate = (actuator) ->
-			callback actuator, true
+		callbackCreate = (err, actuator) ->
+			callback err, actuator, true
 		ActuatorModel.create data, callbackCreate
 	else # Actuator already exists.
-		callback actuators[0], false
+		callback err, actuators[0], false
 		
 ###
 # createIfDriver
 # ====
-# Adds a actuator to the DB and system, if there is a driver to handle it.
+# Adds an actuator to the DB and system, if there is a driver to handle it.
 # @param data (Object): 						Data defining the actuator
 # @param actuatorsDrivers (Driver[]): 			List of drivers supported by the system
 # @param callback (Function(Error, Actuator):null): 	Callback
@@ -121,7 +118,10 @@ ActuatorModel.getOrCreate = (data, callback) ->
 ActuatorModel.createIfDriver = (data, actuatorsDrivers, callback) ->
 	if actuatorsDrivers[type] # If this kind of device is supported:
 		# Check if this actuator isn't already added (the combination type + customId should be unique):
-		Actuator.getOrCreate data, (actuator, created, err) ->
+		Actuator.getOrCreate data, (err, actuator, created, err) ->
+			if err
+				callback err, actuator
+				return
 			if !created
 				callback 'Device already added', actuator
 				return

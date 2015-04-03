@@ -81,12 +81,12 @@ module.exports = SensorModel = cozydb.getModel 'Sensor',
 	# ====
 	# Generates a measure for this Sensor.
 	# @param data (dictionary): 						Measure's data (value, time, type)
-	# @param callback (Function(Measure):null):			Callback
+	# @param callback (Function(Error, Measure):null):	Callback
 	###
 	@createMeasure = (data, callback) ->
 		sanitize data
 		data.sensorId = @id
-		measure = Measure.create data callback
+		Measure.create data callback
 		
 	
 ###
@@ -105,24 +105,21 @@ SensorModel.byId = (id, callback) ->
 # getOrCreate
 # ====
 # Gets a Sensor, or creates it if not found.
-# @param data (Object): 							Data defining the sensor
-# @param callback (Function(Sensor, bool):null): 	Callback function. First parameter if the found or created Sensor; Second parameter is a boolean set true if created / false if found.
+# @param data (Object): 								Data defining the sensor
+# @param callback (Function(Error, Sensor, bool):null): Callback function. 2nd parameter is the found or created Sensor; 3rd parameter is a boolean set true if created / false if found.
 ###
 SensorModel.getOrCreate = (data, callback) ->
 	# customId + type is a primary key.
 	params = key: [accountID, type]
 	SensorModel.request "byCustomIdAndType", params, (err, sensors)->
 	if err
-		log.error err
-		callbackCreate = (sensor) ->
-			callback sensor, true
-		SensorModel.create data, callbackCreate
+		callback err, null, null
 	else if sensors.length is 0
-		callbackCreate = (sensor) ->
-			callback sensor, true
+		callbackCreate = (err, sensor) ->
+			callback err, sensor, true
 		SensorModel.create data, callbackCreate
 	else # Sensor already exists.
-		callback sensors[0], false
+		callback err, sensors[0], false
 		
 ###
 # createIfDriver
@@ -135,7 +132,10 @@ SensorModel.getOrCreate = (data, callback) ->
 SensorModel.createIfDriver = (data, sensorsDrivers, callback) ->
 	if sensorsDrivers[type] # If this kind of device is supported:
 		# Check if this sensor isn't already added (the combination type + customId should be unique):
-		Sensor.getOrCreate data, (sensor, created, err) ->
+		Sensor.getOrCreate data, (err, sensor, created, err) ->
+			if err
+				callback err, sensor
+				return
 			if !created
 				callback 'Device already added', sensor
 				return
