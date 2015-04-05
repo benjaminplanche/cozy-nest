@@ -145,6 +145,7 @@ RuleModel.checkMetRules = (measure, callback) ->
 			callback err, null
 			return
 		
+		# @todo async.map stops and calls the callback at the first returned error. We might not want such a behavior...
 		async.map sensorRules, ((sensorRule, cb) ->
 			if (!sensorRule.intervalEnd || measure.value < sensorRule.intervalEnd) && (!sensorRule.intervalStart || measure.value >= sensorRule.intervalStart)
 				# If the measure triggers the SensorRule, update the corresponding Rule:
@@ -181,4 +182,23 @@ RuleModel.checkMetRules = (measure, callback) ->
 				else
 					callback null, null
 		), callback
-	
+		
+###
+# applyRules
+# ====
+# Applies the ActuatorRules (reactions) of the given rules.
+# @param rules (Rules[]): 					Rules
+# @param actuatorsDrivers (Driver[]): 		List of drivers supported by the system
+# @param callback (Function(Error):null): 	Callback
+###
+RuleModel.applyMetRules = (rules, actuatorsDrivers, callback) ->
+	# @todo async.each stops and calls the callback at the first returned error. We might not want such a behavior...
+	async.each rules, ((rule, cb) ->
+		ActuatorRule.request "byRule", key: rule.id, (err, actuatorRules)->
+			if err
+				callback 'Error while finding ActuatorRules associated to Rule #'+rule.id+': '+err
+				return
+			async.each actuatorRules, ((actuatorRule, cb2) ->
+				actuatorRule.apply actuatorsDrivers, cb2
+			), cb
+		), callback
