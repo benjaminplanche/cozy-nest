@@ -145,7 +145,7 @@ RuleModel.checkMetRules = (measure, callback) ->
 			callback err, null
 			return
 		
-		parallelCalls = ((cb) ->
+		async.map sensorRules, ((sensorRule, cb) ->
 			if (!sensorRule.intervalEnd || measure.value < sensorRule.intervalEnd) && (!sensorRule.intervalStart || measure.value >= sensorRule.intervalStart)
 				# If the measure triggers the SensorRule, update the corresponding Rule:
 				Rule.find sensorRule.ruleId (err, rule) ->
@@ -180,6 +180,5 @@ RuleModel.checkMetRules = (measure, callback) ->
 							sensorRule.updateAttributes met: false (err) -> cb err, null
 				else
 					callback null, null
-		) for sensorRule in sensorRules
-		
-		async.parallel parallelCalls, callback
+		), callback
+	
