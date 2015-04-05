@@ -24,10 +24,10 @@ module.exports = ActuatorRuleModel = cozydb.getModel 'ActuatorRule',
 ActuatorRuleModel.createIfSensor = (data, callback) ->
 	Actuator.find data.sensorId, (err, actuator) ->
 		if err
-			callback 'Actuator associated to this rule couldn't be found: '+err, null
+			callback 'Actuator associated to this rule couldn\'t be found: '+err, null
 			return
 		if !actuator
-			callback 'Actuator associated to this rule doesn't exist', null
+			callback 'Actuator associated to this rule doesn\'t exist', null
 			return
 		
 		ActuatorRuleModel.create data, callback
