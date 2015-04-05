@@ -6,6 +6,7 @@
 ###
 
 cozydb = require 'cozydb'
+
 SensorRule = require './sensorRule'
 ActuatorRule = require './actuatorRule'
 
@@ -22,8 +23,7 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 	# @param callback (Function(Error):null):				Callback
 	###
 	@incrementNbSensorRules(callback)
-		@nbSensorRules++
-		RuleModel.update @, callback
+		@updateAttributes nbSensorRules: @nbSensorRules+1 callback
 	
 	###
 	# decrementNbSensorRules
@@ -32,8 +32,7 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 	# @param callback (Function(Error):null):				Callback
 	###
 	@decrementNbSensorRules(callback)
-		@nbSensorRules--
-		RuleModel.update @, callback
+		@updateAttributes nbSensorRules: @nbSensorRules-1 callback
 	
 	###
 	# incrementNbSensorRulesMet
@@ -42,8 +41,7 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 	# @param callback (Function(Error):null):				Callback
 	###
 	@incrementNbSensorRulesMet(callback)
-		@nbSensorRulesMet++
-		RuleModel.update @, callback
+		@updateAttributes nbSensorRulesMet: @nbSensorRulesMet+1 callback
 	
 	###
 	# decrementNbSensorRulesMet
@@ -52,8 +50,7 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 	# @param callback (Function(Error):null):				Callback
 	###
 	@decrementNbSensorRulesMet(callback)
-		@nbSensorRulesMet--
-		RuleModel.update @, callback
+		@updateAttributes nbSensorRulesMet: @nbSensorRulesMet-1 callback
 	
 	###
 	# createSensorRule
@@ -129,4 +126,3 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 				callback msgErr
 		
 		super callback
-	
