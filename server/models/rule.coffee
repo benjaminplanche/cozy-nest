@@ -11,7 +11,49 @@ ActuatorRule = require './actuatorRule'
 
 module.exports = RuleModel = cozydb.getModel 'Rule',
 	@schema:
-		name: 		type : String		# not Empty
+		name: 				type : String		# not Empty
+		nbSensorRules:		type : Number, default : 0
+		nbSensorRulesMet:	type : Number, default : 0
+	
+	###
+	# incrementNbSensorRules
+	# ====
+	# Increments (by 1) the number of SensorRules this rule has.
+	# @param callback (Function(Error):null):				Callback
+	###
+	@incrementNbSensorRules(callback)
+		@nbSensorRules++
+		RuleModel.update @, callback
+	
+	###
+	# decrementNbSensorRules
+	# ====
+	# Decrements (by 1) the number of SensorRules this rule has.
+	# @param callback (Function(Error):null):				Callback
+	###
+	@decrementNbSensorRules(callback)
+		@nbSensorRules--
+		RuleModel.update @, callback
+	
+	###
+	# incrementNbSensorRulesMet
+	# ====
+	# Increments (by 1) the number of fulfilled SensorRules this rule has.
+	# @param callback (Function(Error):null):				Callback
+	###
+	@incrementNbSensorRulesMet(callback)
+		@nbSensorRulesMet++
+		RuleModel.update @, callback
+	
+	###
+	# decrementNbSensorRulesMet
+	# ====
+	# Decrements (by 1) the number of fulfilled SensorRules this rule has.
+	# @param callback (Function(Error):null):				Callback
+	###
+	@decrementNbSensorRulesMet(callback)
+		@nbSensorRulesMet--
+		RuleModel.update @, callback
 	
 	###
 	# createSensorRule
@@ -23,7 +65,25 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 	@createSensorRule = (data, callback) ->
 		sanitize data
 		data.ruleId = @id
-		SensorRule.createIfSensor data callback
+		rule = @
+		cb = (err, sensorRule) ->
+			if err
+				callback err, sensorRule
+				return
+			# Incrementing the number of SensorRules this rule has:
+			rule.incrementNbSensorRules (err2) ->
+				if err2
+					# Cancelling modif:
+					SensorRule.requestDestroy "all", {key: sensorRule.id}, (err3) ->
+						if err3
+							err2 += " AND " + err3
+						callback err2, null
+					return
+				callback null, sensorRule
+			# If the SensorRule (ie. condition) is already met, we let the Rule know:
+			if sensorRule.met
+				rule.incrementNbSensorRulesMet (err2) -> callback err2, sensorRule
+		SensorRule.createIfSensor data cb
 	
 	###
 	# createActuatorRule
