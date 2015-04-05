@@ -23,21 +23,18 @@ module.exports = ActuatorModel = cozydb.getModel 'Actuator',
 		actuatorsDrivers[@type].remove @customId, (err2) ->
 			if err2
 				callback err2
-				return
-			# Remove from DB:
-			@destroy (err3) ->
-				if err3:
-					# Cancelling Modif:
-					actuatorsDrivers[@type].add prevActuator.customId, id, (err2) ->
-						if err2
-							callback 'Device removed from system but not DB. Contact Admin'
-							return
-						callback err3
-						return
-				callback null
-				return
-			return
-		return
+			else
+				# Remove from DB:
+				@destroy (err3) ->
+					if err3:
+						# Cancelling Modif:
+						actuatorsDrivers[@type].add prevActuator.customId, id, (err2) ->
+							if err2
+								callback 'Device removed from system but not DB. Contact Admin (' + err3 + ' AND ' err2 + ')'
+							else 
+								callback err3
+					else
+						callback null
 	
 	###
 	# updateAttributesForDBAndDriver
@@ -57,21 +54,18 @@ module.exports = ActuatorModel = cozydb.getModel 'Actuator',
 		@updateAttributes data, (err, actuator) ->
 			if err
 				callback err, actuator
-				return
-			# Update Driver:	
-			actuatorsDrivers[@type].update prevData.customId, data.customId, (err2) ->
-				if err2:
-					# Cancelling Modif:
-					@updateAttributes prevData, (err3, actuator2) ->
-						if err3
-							callback 'Can't update Actuator in Driver & Can't reverse update in DB. Contact Admin', actuator2
-							return
-						callback err2, actuator2
-						return
-				callback null, actuator
-				return
-			return
-		return
+			else
+				# Update Driver:	
+				actuatorsDrivers[@type].update prevData.customId, data.customId, (err2) ->
+					if err2:
+						# Cancelling Modif:
+						@updateAttributes prevData, (err3, actuator2) ->
+							if err3
+								callback 'Can\'t update Actuator in Driver & Can\'t reverse update in DB. Contact Admin (' + err2 + ' AND ' err3 + ')', actuator2
+							else
+								callback err2, actuator2
+					else
+						callback null, actuator
 	
 	
 	
@@ -121,21 +115,16 @@ ActuatorModel.createIfDriver = (data, actuatorsDrivers, callback) ->
 		Actuator.getOrCreate data, (err, actuator, created) ->
 			if err
 				callback err, actuator
-				return
-			if !created
+			else if !created
 				callback 'Device already added', actuator
-				return
-			# Let the driver handle the integration of the device to the system:
-			actuatorsDrivers[type].add customId, actuator.id, (err) ->
-				if err
-					# Cancelling modif:
-					Actuator.requestDestroy "all", {key: actuator.id}, (err) ->
-						callback err, null
-						return
-				else
-					callback null, actuator
-				return
-			return
+			else	
+				# Let the driver handle the integration of the device to the system:
+				actuatorsDrivers[type].add customId, actuator.id, (err) ->
+					if err
+						# Cancelling modif:
+						Actuator.requestDestroy "all", {key: actuator.id}, (err) ->
+							callback err, null
+					else
+						callback null, actuator
 	else
 		callback 'Device not supported', null
-	return

@@ -25,21 +25,18 @@ module.exports = SensorModel = cozydb.getModel 'Sensor',
 		sensorsDrivers[@type].remove @customId, (err2) ->
 			if err2
 				callback err2
-				return
-			# Remove from DB:
-			@destroy (err3) ->
-				if err3:
-					# Cancelling Modif:
-					sensorsDrivers[@type].add prevSensor.customId, id, (err2) ->
-						if err2
-							callback 'Device removed from system but not DB. Contact Admin'
-							return
-						callback err3
-						return
-				callback null
-				return
-			return
-		return
+			else
+				# Remove from DB:
+				@destroy (err3) ->
+					if err3
+						# Cancelling Modif:
+						sensorsDrivers[@type].add prevSensor.customId, id, (err2) ->
+							if err2
+								callback 'Device removed from system but not DB. Contact Admin (' + err3 + ' AND ' err2 + ')'
+							else
+								callback err3
+					else
+						callback null
 	
 	###
 	# updateAttributesForDBAndDriver
@@ -59,21 +56,18 @@ module.exports = SensorModel = cozydb.getModel 'Sensor',
 		@updateAttributes data, (err, sensor) ->
 			if err
 				callback err, sensor
-				return
 			# Update Driver:	
-			sensorsDrivers[@type].update prevData.customId, data.customId, (err2) ->
-				if err2:
-					# Cancelling Modif:
-					@updateAttributes prevData, (err3, sensor2) ->
-						if err3
-							callback 'Can't update Sensor in Driver & Can't reverse update in DB. Contact Admin', sensor2
-							return
-						callback err2, sensor2
-						return
-				callback null, sensor
-				return
-			return
-		return
+			else
+				sensorsDrivers[@type].update prevData.customId, data.customId, (err2) ->
+					if err2
+						# Cancelling Modif:
+						@updateAttributes prevData, (err3, sensor2) ->
+							if err3
+								callback 'Can\'t update Sensor in Driver & Can\'t reverse update in DB. Contact Admin (' + err2 + ' AND ' err3 + ')', sensor2
+								return
+							callback err2, sensor2
+					else
+						callback null, sensor
 	
 	
 	###
@@ -135,21 +129,16 @@ SensorModel.createIfDriver = (data, sensorsDrivers, callback) ->
 		Sensor.getOrCreate data, (err, sensor, created) ->
 			if err
 				callback err, sensor
-				return
-			if !created
+			else if !created
 				callback 'Device already added', sensor
-				return
 			# Let the driver handle the integration of the device to the system:
-			sensorsDrivers[type].add customId, sensor.id, (err) ->
-				if err
-					# Cancelling modif:
-					Sensor.requestDestroy "all", {key: sensor.id}, (err) ->
-						callback err, null
-						return
-				else
+			else
+				sensorsDrivers[type].add customId, sensor.id, (err) ->
+					if err
+						# Cancelling modif:
+						Sensor.requestDestroy "all", {key: sensor.id}, (err) ->
+							callback err, null
+					else
 					callback null, sensor
-				return
-			return
 	else
 		callback 'Device not supported', null
-	return
