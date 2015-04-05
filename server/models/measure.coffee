@@ -12,3 +12,10 @@ module.exports = MeasureModel = cozydb.getModel 'Measure',
 	value: 		type : Number		# not Empty
 	type: 		type : String		# not Empty
 	sensorId:	type : String		# not Empty
+	
+MeasureModel.allBySensorIdAndTimeRange = (sensorId, timeMin, timeMax, callback) ->
+	params =
+		startkey: [sensorId, timeMin ? new Date(0)]
+		endkey: [sensorId, timeMax ? Date.now()]
+		descending: true
+	MeasureModel.request "bySensorIdAndTime", params, callback

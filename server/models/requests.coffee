@@ -8,6 +8,7 @@ cozydb = require 'cozydb'
 
 
 byCustomIdAndType = (doc) -> emit [doc.customId, doc.type], doc
+bySensorIdAndTime = (doc) -> emit [doc.sensorId, doc.time], doc
 byId: (doc) -> emit doc.id, doc
 bySensor: (doc) -> emit doc.sensorId, doc
 byActuator: (doc) -> emit doc.actuatorId, doc
@@ -27,7 +28,7 @@ module.exports =
 	measure:
         all: cozydb.defaultRequests.all
 		byId: byId
-		# @todo byDateAndSensor
+		bySensorIdAndTime: bySensorIdAndTime
 	
 	rule:
         all: cozydb.defaultRequests.all
