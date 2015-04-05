@@ -6,9 +6,11 @@
 ###
 
 cozydb = require 'cozydb'
+async = require 'async'
 
 SensorRule = require './sensorRule'
 ActuatorRule = require './actuatorRule'
+Measure = require './measure'
 
 module.exports = RuleModel = cozydb.getModel 'Rule',
 	@schema:
@@ -126,3 +128,57 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 				callback msgErr
 		
 		super callback
+
+###
+# checkMetRules
+# ====
+# Checks the rules which have all their SensorRules (conditions) met when taking into account the given Measure.
+# @param measure (Measure): 						Measure to take into account
+# @param callback (Function(Error, Rule[]):null): 	Callback
+###
+RuleModel.checkMetRules = (measure, callback) ->
+	# First find the SensorRules 
+    param =
+        key: [measure.sensorId, measure.type]
+	SensorRule.request 'bySensorIdAndType', param, (err, sensorRules)->
+		if err
+			callback err, null
+			return
+		
+		parallelCalls = (cb) ->
+			if (!sensorRule.intervalEnd || measure.value < sensorRule.intervalEnd) && (!sensorRule.intervalStart || measure.value >= sensorRule.intervalStart)
+				# If the measure triggers the SensorRule, update the corresponding Rule:
+				Rule.find sensorRule.ruleId (err, rule) ->
+					if err
+						cb 'Error when finding Rule related to SensorRule #'+sensorRule.id+': '+err, null
+						return
+					if !rule
+						cb 'Rule related to SensorRule #'+sensorRule.id+' not found.', null
+						return
+					
+					isRuleMet = (rule.nbSensorRulesMet + 1) == rule.nbSensorRules
+					rule.incrementNbSensorRulesMet (err) -> 
+						if err
+							cb 'Error when updating Rule related to SensorRule #'+sensorRule.id+' (to increment its number of met SensorRules): '+err, isRuleMet? rule:null
+							return
+						sensorRule.updateAttributes met: true (err) -> cb err, isRuleMet? rule:null
+			else
+				if sensorRule.met
+					# If the conditions was met, it is not the case anymore.
+					# We thus have to decrement the number of met SensorRules of the corresponding rule, and update the SensorRule itself:
+					Rule.find sensorRule.ruleId (err, rule) ->
+						if err
+							cb 'Error when finding Rule related to SensorRule #'+sensorRule.id+': '+err, null
+							return
+						if !rule
+							cb 'Rule related to SensorRule #'+sensorRule.id+' not found.', null
+							return
+						rule.decrementNbSensorRulesMet (err) -> 
+							if err
+								cb 'Error when updating Rule related to SensorRule #'+sensorRule.id+' (to decrement its number of met SensorRules): '+err, null
+								return
+							sensorRule.updateAttributes met: false (err) -> cb err, null
+				else
+					callback null, null
+		
+		async.parallel parallelCalls, callback
