@@ -33,9 +33,9 @@ module.exports =
     killServer: ->
         @server.close()
 
-    cleanDB = (done) -> fixtures.resetDatabase callback: done
+    cleanDB: (done) -> fixtures.resetDatabase callback: done
 	
-	cleanDBWithRequests = (done) -> fixtures.resetDatabase removeAllRequests: true, callback: done
+	cleanDBWithRequests: (done) -> fixtures.resetDatabase removeAllRequests: true, callback: done
 
     createSensor: (data) -> (done) ->
         baseSensor = new Sensor(data)
