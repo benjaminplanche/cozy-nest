@@ -10,47 +10,34 @@ cozydb = require 'cozydb'
 byCustomIdAndType = (doc) -> emit [doc.customId, doc.type], doc
 bySensorAndTime = (doc) -> emit [doc.sensorId, doc.time], doc
 bySensorAndType = (doc) -> emit [doc.sensorId, doc.type], doc
-byId: (doc) -> emit doc.id, doc
-bySensor: (doc) -> emit doc.sensorId, doc
-byActuator: (doc) -> emit doc.actuatorId, doc
-byRule: (doc) -> emit doc.ruleId, doc
+bySensor = (doc) -> emit doc.sensorId, doc
+byActuator = (doc) -> emit doc.actuatorId, doc
+byRule = (doc) -> emit doc.ruleId, doc
 
 module.exports =
-    sensor:
-        all: cozydb.defaultRequests.all
-		byCustomIdAndType: byCustomIdAndType
-		byId: byId
+	sensor:
+		'all': cozydb.defaultRequests.all
+		'byCustomIdAndType': byCustomIdAndType
 	
 	actuator:
-        all: cozydb.defaultRequests.all
-		byCustomIdAndType: byCustomIdAndType
-		byId: byId
+		'all': cozydb.defaultRequests.all
+		'byCustomIdAndType': byCustomIdAndType
 	
 	measure:
-        all: cozydb.defaultRequests.all
-		byId: byId
-		bySensorAndTime: bySensorAndTime
+		'all': cozydb.defaultRequests.all
+		'bySensorAndTime': bySensorAndTime
 	
 	rule:
-        all: cozydb.defaultRequests.all
-		byId: byId
+		'all': cozydb.defaultRequests.all
 	
 	sensorRule:
-        all: cozydb.defaultRequests.all
-		byId: byId
-		byRule: byRule
-		bySensor: bySensor
-		bySensorAndType: bySensorAndType
+		'all': cozydb.defaultRequests.all
+		'byRule': byRule
+		'bySensor': bySensor
+		'bySensorAndType': bySensorAndType
 	
 	actuatorRule:
-        all: cozydb.defaultRequests.all
-		byId: byId
-		byRule: byRule
-		byActuator: byActuator
-		
-	# # create all the requests you want!
-	# customRequest:
-		# map: (doc) ->
-			# # map function
-		# reduce: (key, values, rereduce) ->
-			# # non mandatory reduce function
+		'all': cozydb.defaultRequests.all
+		'byRule': byRule
+		'byActuator': byActuator
+

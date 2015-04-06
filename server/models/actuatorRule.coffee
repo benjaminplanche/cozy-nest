@@ -8,10 +8,10 @@
 cozydb = require 'cozydb'
 Actuator = require './actuator'
 
-module.exports = ActuatorRuleModel = cozydb.getModel 'ActuatorRule',
+module.exports = class ActuatorRule extends cozydb.CozyModel
 	@schema:
-		ruleId		type : String						# not Empty, not Null
-		actuatorId	type : String						# not Empty, not Null
+		ruleId:		type : String						# not Empty, not Null
+		actuatorId:	type : String						# not Empty, not Null
 		value: 		type : String
 		isActive: 	type : Boolean, default : false
 	
@@ -22,7 +22,7 @@ module.exports = ActuatorRuleModel = cozydb.getModel 'ActuatorRule',
 	# @param actuatorsDrivers (Driver[]): 		List of drivers supported by the system
 	# @param callback (Function(Error):null): 	Callback
 	###
-	@apply(actuatorsDrivers, callback)
+	apply: (actuatorsDrivers, callback) ->
 		if !@isActive
 			actuatorRule = @
 			Actuator.find @actuatorId (err, actuator)->
@@ -40,20 +40,20 @@ module.exports = ActuatorRuleModel = cozydb.getModel 'ActuatorRule',
 		else
 			callback null
 	
-###
-# createIfActuator
-# ====
-# Creates an ActuatorRule in the DB, if the actuator it is associated to exists.
-# @param data (Object): 								Data defining the ActuatorRule
-# @param callback (Function(Error, SensorRule):null): 	Callback
-###
-ActuatorRuleModel.createIfSensor = (data, callback) ->
-	Actuator.find data.sensorId, (err, actuator) ->
-		if err
-			callback 'Actuator associated to this rule couldn\'t be found: '+err, null
-			return
-		if !actuator
-			callback 'Actuator associated to this rule doesn\'t exist', null
-			return
-		
-		ActuatorRuleModel.create data, callback
+	###
+	# createIfActuator
+	# ====
+	# Creates an ActuatorRule in the DB, if the actuator it is associated to exists.
+	# @param data (Object): 								Data defining the ActuatorRule
+	# @param callback (Function(Error, SensorRule):null): 	Callback
+	###
+	@createIfSensor: (data, callback) ->
+		Actuator.find data.sensorId, (err, actuator) ->
+			if err
+				callback 'Actuator associated to this rule couldn\'t be found: '+err, null
+				return
+			if !actuator
+				callback 'Actuator associated to this rule doesn\'t exist', null
+				return
+			
+			ActuatorRuleModel.create data, callback

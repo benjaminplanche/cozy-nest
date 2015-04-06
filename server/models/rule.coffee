@@ -12,7 +12,7 @@ SensorRule = require './sensorRule'
 ActuatorRule = require './actuatorRule'
 Measure = require './measure'
 
-module.exports = RuleModel = cozydb.getModel 'Rule',
+module.exports = class Rule extends cozydb.CozyModel
 	@schema:
 		name: 				type : String		# not Empty
 		nbSensorRules:		type : Number, default : 0
@@ -24,8 +24,8 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 	# Increments (by 1) the number of SensorRules this rule has.
 	# @param callback (Function(Error):null):				Callback
 	###
-	@incrementNbSensorRules(callback)
-		@updateAttributes nbSensorRules: @nbSensorRules+1 callback
+	incrementNbSensorRules: (callback) ->
+		@updateAttributes nbSensorRules: @nbSensorRules+1, callback
 	
 	###
 	# decrementNbSensorRules
@@ -33,8 +33,8 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 	# Decrements (by 1) the number of SensorRules this rule has.
 	# @param callback (Function(Error):null):				Callback
 	###
-	@decrementNbSensorRules(callback)
-		@updateAttributes nbSensorRules: @nbSensorRules-1 callback
+	decrementNbSensorRules: (callback) ->
+		@updateAttributes nbSensorRules: @nbSensorRules-1, callback
 	
 	###
 	# incrementNbSensorRulesMet
@@ -42,8 +42,8 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 	# Increments (by 1) the number of fulfilled SensorRules this rule has.
 	# @param callback (Function(Error):null):				Callback
 	###
-	@incrementNbSensorRulesMet(callback)
-		@updateAttributes nbSensorRulesMet: @nbSensorRulesMet+1 callback
+	incrementNbSensorRulesMet: (callback) ->
+		@updateAttributes nbSensorRulesMet: @nbSensorRulesMet+1, callback
 	
 	###
 	# decrementNbSensorRulesMet
@@ -51,8 +51,8 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 	# Decrements (by 1) the number of fulfilled SensorRules this rule has.
 	# @param callback (Function(Error):null):				Callback
 	###
-	@decrementNbSensorRulesMet(callback)
-		@updateAttributes nbSensorRulesMet: @nbSensorRulesMet-1 callback
+	decrementNbSensorRulesMet: (callback) ->
+		@updateAttributes nbSensorRulesMet: @nbSensorRulesMet-1, callback
 	
 	###
 	# createSensorRule
@@ -61,7 +61,7 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 	# @param data (dictionary): 							SensorRule's data (sensorId, type, intervalStart, intervalEnd)
 	# @param callback (Function(Error, SensorRule):null):	Callback
 	###
-	@createSensorRule = (data, callback) ->
+	createSensorRule: (data, callback) ->
 		sanitize data
 		data.ruleId = @id
 		rule = @
@@ -91,7 +91,7 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 	# @param data (dictionary): 							ActuatorRule's data (type, value, isActive)
 	# @param callback (Function(Error, ActuatorRule):null):	Callback
 	###
-	@createActuatorRule = (data, callback) ->
+	createActuatorRule: (data, callback) ->
 		sanitize data
 		data.ruleId = @id
 		ActuatorRule.createIfActuator data callback
@@ -103,7 +103,7 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 	# Deletes the Rule, and its SensorRules and ActuatorRules
 	# @param callback (Function(Error):null):		Callback
 	###
-	@destroy = (callback) ->
+	destroy: (callback) ->
 		params = key: @id
 		SensorRule.request "byRule", params, (err, sensorRules)->
 			if err
@@ -129,44 +129,26 @@ module.exports = RuleModel = cozydb.getModel 'Rule',
 		
 		super callback
 
-###
-# checkMetRules
-# ====
-# Checks the rules which have all their SensorRules (conditions) met when taking into account the given Measure.
-# @param measure (Measure): 						Measure to take into account
-# @param callback (Function(Error, Rule[]):null): 	Callback
-###
-RuleModel.checkMetRules = (measure, callback) ->
-	# First find the SensorRules 
-    param =
-        key: [measure.sensorId, measure.type]
-	SensorRule.request 'bySensorIdAndType', param, (err, sensorRules)->
-		if err
-			callback err, null
-			return
-		
-		# @todo async.map stops and calls the callback at the first returned error. We might not want such a behavior...
-		async.map sensorRules, ((sensorRule, cb) ->
-			if (!sensorRule.intervalEnd || measure.value < sensorRule.intervalEnd) && (!sensorRule.intervalStart || measure.value >= sensorRule.intervalStart)
-				# If the measure triggers the SensorRule, update the corresponding Rule:
-				Rule.find sensorRule.ruleId (err, rule) ->
-					if err
-						cb 'Error when finding Rule related to SensorRule #'+sensorRule.id+': '+err, null
-						return
-					if !rule
-						cb 'Rule related to SensorRule #'+sensorRule.id+' not found.', null
-						return
-					
-					isRuleMet = (rule.nbSensorRulesMet + 1) == rule.nbSensorRules
-					rule.incrementNbSensorRulesMet (err) -> 
-						if err
-							cb 'Error when updating Rule related to SensorRule #'+sensorRule.id+' (to increment its number of met SensorRules): '+err, isRuleMet? rule:null
-							return
-						sensorRule.updateAttributes met: true (err) -> cb err, isRuleMet? rule:null
-			else
-				if sensorRule.met
-					# If the conditions was met, it is not the case anymore.
-					# We thus have to decrement the number of met SensorRules of the corresponding rule, and update the SensorRule itself:
+	###
+	# checkMetRules
+	# ====
+	# Checks the rules which have all their SensorRules (conditions) met when taking into account the given Measure.
+	# @param measure (Measure): 						Measure to take into account
+	# @param callback (Function(Error, Rule[]):null): 	Callback
+	###
+	@checkMetRules: (measure, callback) ->
+		# First find the SensorRules 
+		param =
+			key: [measure.sensorId, measure.type]
+		SensorRule.request 'bySensorIdAndType', param, (err, sensorRules)->
+			if err
+				callback err, null
+				return
+			
+			# @todo async.map stops and calls the callback at the first returned error. We might not want such a behavior...
+			async.map sensorRules, ((sensorRule, cb) ->
+				if (!sensorRule.intervalEnd || measure.value < sensorRule.intervalEnd) && (!sensorRule.intervalStart || measure.value >= sensorRule.intervalStart)
+					# If the measure triggers the SensorRule, update the corresponding Rule:
 					Rule.find sensorRule.ruleId (err, rule) ->
 						if err
 							cb 'Error when finding Rule related to SensorRule #'+sensorRule.id+': '+err, null
@@ -174,31 +156,49 @@ RuleModel.checkMetRules = (measure, callback) ->
 						if !rule
 							cb 'Rule related to SensorRule #'+sensorRule.id+' not found.', null
 							return
-						rule.decrementNbSensorRulesMet (err) -> 
+						
+						isRuleMet = (rule.nbSensorRulesMet + 1) == rule.nbSensorRules
+						rule.incrementNbSensorRulesMet (err) -> 
 							if err
-								cb 'Error when updating Rule related to SensorRule #'+sensorRule.id+' (to decrement its number of met SensorRules): '+err, null
+								cb 'Error when updating Rule related to SensorRule #'+sensorRule.id+' (to increment its number of met SensorRules): '+err, isRuleMet? rule:null
 								return
-							sensorRule.updateAttributes met: false (err) -> cb err, null
+							sensorRule.updateAttributes met: true, ((err) -> cb err, isRuleMet? rule:null)
 				else
-					callback null, null
-		), callback
-		
-###
-# applyRules
-# ====
-# Applies the ActuatorRules (reactions) of the given rules.
-# @param rules (Rules[]): 					Rules
-# @param actuatorsDrivers (Driver[]): 		List of drivers supported by the system
-# @param callback (Function(Error):null): 	Callback
-###
-RuleModel.applyMetRules = (rules, actuatorsDrivers, callback) ->
-	# @todo async.each stops and calls the callback at the first returned error. We might not want such a behavior...
-	async.each rules, ((rule, cb) ->
-		ActuatorRule.request "byRule", key: rule.id, (err, actuatorRules)->
-			if err
-				callback 'Error while finding ActuatorRules associated to Rule #'+rule.id+': '+err
-				return
-			async.each actuatorRules, ((actuatorRule, cb2) ->
-				actuatorRule.apply actuatorsDrivers, cb2
-			), cb
-		), callback
+					if sensorRule.met
+						# If the conditions was met, it is not the case anymore.
+						# We thus have to decrement the number of met SensorRules of the corresponding rule, and update the SensorRule itself:
+						Rule.find sensorRule.ruleId (err, rule) ->
+							if err
+								cb 'Error when finding Rule related to SensorRule #'+sensorRule.id+': '+err, null
+								return
+							if !rule
+								cb 'Rule related to SensorRule #'+sensorRule.id+' not found.', null
+								return
+							rule.decrementNbSensorRulesMet (err) -> 
+								if err
+									cb 'Error when updating Rule related to SensorRule #'+sensorRule.id+' (to decrement its number of met SensorRules): '+err, null
+									return
+								sensorRule.updateAttributes met: false, ((err) -> cb err, null)
+					else
+						callback null, null
+			), callback
+			
+	###
+	# applyRules
+	# ====
+	# Applies the ActuatorRules (reactions) of the given rules.
+	# @param rules (Rules[]): 					Rules
+	# @param actuatorsDrivers (Driver[]): 		List of drivers supported by the system
+	# @param callback (Function(Error):null): 	Callback
+	###
+	@applyMetRules: (rules, actuatorsDrivers, callback) ->
+		# @todo async.each stops and calls the callback at the first returned error. We might not want such a behavior...
+		async.each rules, ((rule, cb) ->
+			ActuatorRule.request "byRule", key: rule.id, (err, actuatorRules)->
+				if err
+					callback 'Error while finding ActuatorRules associated to Rule #'+rule.id+': '+err
+					return
+				async.each actuatorRules, ((actuatorRule, cb2) ->
+					actuatorRule.apply actuatorsDrivers, cb2
+				), cb
+			), callback

@@ -10,12 +10,13 @@ Sensor = require './sensor'
 Rule = require './rule'
 
 # @todo When update type or interval, check if condition is still met (or simply set it to false)
-module.exports = SensorRule = cozydb.getModel 'SensorRule',
-	ruleId			type : String		# not Empty, not Null
-	sensorId		type : String		# not Empty, not Null
-	type: 			type : String		# not Empty, not Null
-	intervalStart: 	type : String
-	intervalEnd: 	type : String
+module.exports = class SensorRule extends cozydb.CozyModel
+	@schema:
+		ruleId:			type : String		# not Empty, not Null
+		sensorId:		type : String		# not Empty, not Null
+		type: 			type : String		# not Empty, not Null
+		intervalStart: 	type : String
+		intervalEnd: 	type : String
 	
 	###
 	# destroy
@@ -23,7 +24,7 @@ module.exports = SensorRule = cozydb.getModel 'SensorRule',
 	# Deletes the SensorRule, and updates the information of the Rule it belonged to.
 	# @param callback (Function(Error):null):		Callback
 	###
-	@destroy = (callback) ->
+	destroy: (callback) ->
 		sensorRule = @
 		destroySensorRule = super
 		Rule.find @ruleId, (err, rule) ->
@@ -47,20 +48,20 @@ module.exports = SensorRule = cozydb.getModel 'SensorRule',
 					else
 						destroySensorRule callback
 	
-###
-# createIfSensor
-# ====
-# Creates a SensorRule in the DB, if the sensor it is associated to exists.
-# @param data (Object): 								Data defining the SensorRule
-# @param callback (Function(Error, SensorRule):null): 	Callback
-###
-SensorRule.createIfSensor = (data, callback) ->
-	Sensor.find data.sensorId, (err, sensor) ->
-		if err
-			callback 'Sensor associated to this rule couldn\'t be found: '+err, null
-			return
-		if !sensor
-			callback 'Sensor associated to this rule doesn\'t exist', null
-			return
-		
-		SensorModel.create data, callback
+	###
+	# createIfSensor
+	# ====
+	# Creates a SensorRule in the DB, if the sensor it is associated to exists.
+	# @param data (Object): 								Data defining the SensorRule
+	# @param callback (Function(Error, SensorRule):null): 	Callback
+	###
+	@createIfSensor: (data, callback) ->
+		Sensor.find data.sensorId, (err, sensor) ->
+			if err
+				callback 'Sensor associated to this rule couldn\'t be found: '+err, null
+				return
+			if !sensor
+				callback 'Sensor associated to this rule doesn\'t exist', null
+				return
+			
+			SensorModel.create data, callback
