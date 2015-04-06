@@ -5,7 +5,7 @@
 # Routes to call the controllers.
 ###
 
-sensor			= require './sensors'
+sensor			= require './sensor'
 actuator		= require './actuator'
 measure			= require './measure'
 rule			= require './rule'
