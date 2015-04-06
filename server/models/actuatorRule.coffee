@@ -36,7 +36,7 @@ module.exports = ActuatorRuleModel = cozydb.getModel 'ActuatorRule',
 					if err
 						callback 'Error while sending request to the Actuator associated to ActuatorRule #'+actuatorRule.id+': '+err
 						return
-					actuatorRule.update isActive: true, callback
+					actuatorRule.updateAttributes isActive: true, callback
 		else
 			callback null
 	
