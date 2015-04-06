@@ -28,7 +28,7 @@ module.exports = ActuatorModel = cozydb.getModel 'Actuator',
 				@destroy (err3) ->
 					if err3:
 						# Cancelling Modif:
-						actuatorsDrivers[@type].add prevActuator.customId, id, (err2) ->
+						actuatorsDrivers[@type].remove prevActuator.customId, id, (err2) ->
 							if err2
 								callback 'Device removed from system but not DB. Contact Admin (' + err3 + ' AND ' err2 + ')'
 							else 
@@ -44,7 +44,7 @@ module.exports = ActuatorModel = cozydb.getModel 'Actuator',
 	# @param actuatorsDrivers (Driver[]): 				List of drivers supported by the system
 	# @param callback (Function(Error, Actuator):null):	Callback
 	###
-	# @todo Conver special case if "type" is changed -> Then the driver taking care of this device must be changed too!
+	# @todo Cover special case if "type" is changed -> Then the driver taking care of this device must be changed too!
 	@updateAttributesForDBAndDriver = (data, actuatorsDrivers, callback) ->
 		prevData =
 			customId: @customId

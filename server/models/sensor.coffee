@@ -30,7 +30,7 @@ module.exports = SensorModel = cozydb.getModel 'Sensor',
 				@destroy (err3) ->
 					if err3
 						# Cancelling Modif:
-						sensorsDrivers[@type].add prevSensor.customId, id, (err2) ->
+						sensorsDrivers[@type].remove prevSensor.customId, id, (err2) ->
 							if err2
 								callback 'Device removed from system but not DB. Contact Admin (' + err3 + ' AND ' err2 + ')'
 							else
@@ -46,7 +46,7 @@ module.exports = SensorModel = cozydb.getModel 'Sensor',
 	# @param sensorsDrivers (Driver[]): 				List of drivers supported by the system
 	# @param callback (Function(Error, Sensor):null):	Callback
 	###
-	# @todo Conver special case if "type" is changed -> Then the driver taking care of this device must be changed too!
+	# @todo Cover special case if "type" is changed -> Then the driver taking care of this device must be changed too!
 	@updateAttributesForDBAndDriver = (data, sensorsDrivers, callback) ->
 		prevData =
 			customId: @customId
