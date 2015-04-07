@@ -1,25 +1,42 @@
 americano = require 'americano'
+Realtimer = require 'cozy-realtime-adapter'
+
 config =
-    common: [
-        americano.bodyParser()
-        americano.methodOverride()
-        americano.errorHandler
-            dumpExceptions: true
-            showStack: true
-        americano.static __dirname + '/../client/public',
-            maxAge: 86400000
-    ]
+	common: 
+		use: [
+			americano.bodyParser()
+			americano.methodOverride()
+			americano.errorHandler
+				dumpExceptions: true
+				showStack: true
+			americano.static __dirname + '/../client/public',
+				maxAge: 86400000
+		]
+		afterStart: (app, server) ->
 
-    development: [
-        americano.logger 'dev'
-    ]
+			app.server = server
+			
+			# @todo Load Drivers
+			# actuatorsDrivers = ...
+			# sensorsDrivers = ...
 
-    production: [
-        americano.logger 'short'
-    ]
+			# Pass reference to controllers:
+			# require('./controllers/actuator').setDrivers actuatorsDrivers
+			# require('./controllers/sensor').setDrivers sensorsDrivers
 
-    plugins: [
-        'cozydb'
-    ]
+			# Initialize Realtime
+			realtime = RealtimeAdapter server, ['nest.*']);
+			
+	development: [
+		americano.logger 'dev'
+	]
+
+	production: [
+		americano.logger 'short'
+	]
+
+	plugins: [
+		'cozydb'
+	]
 
 module.exports = config
