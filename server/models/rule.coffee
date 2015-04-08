@@ -188,10 +188,9 @@ module.exports = class Rule extends cozydb.CozyModel
 	# ====
 	# Applies the ActuatorRules (reactions) of the given rules.
 	# @param rules (Rules[]): 					Rules
-	# @param actuatorsDrivers (Driver[]): 		List of drivers supported by the system
 	# @param callback (Function(Error):null): 	Callback
 	###
-	@applyMetRules: (rules, actuatorsDrivers, callback) ->
+	@applyRules: (rules, callback) ->
 		# @todo async.each stops and calls the callback at the first returned error. We might not want such a behavior...
 		async.each rules, ((rule, cb) ->
 			ActuatorRule.request "byRule", key: rule.id, (err, actuatorRules)->
@@ -199,6 +198,6 @@ module.exports = class Rule extends cozydb.CozyModel
 					callback 'Error while finding ActuatorRules associated to Rule #'+rule.id+': '+err
 					return
 				async.each actuatorRules, ((actuatorRule, cb2) ->
-					actuatorRule.apply actuatorsDrivers, cb2
+					actuatorRule.apply cb2
 				), cb
 			), callback

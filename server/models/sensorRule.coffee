@@ -26,7 +26,7 @@ module.exports = class SensorRule extends cozydb.CozyModel
 	###
 	destroy: (callback) ->
 		sensorRule = @
-		destroySensorRule = super
+		superDestroy = super
 		Rule.find @ruleId, (err, rule) ->
 			if err
 				callback 'Rule associated to this SensorRule couldn\'t be found: '+err
@@ -44,18 +44,19 @@ module.exports = class SensorRule extends cozydb.CozyModel
 							if err
 								callback 'Rule associated to this SensorRule couldn\'t be updated (to decrement its number of met SensorRules): '+err
 							else
-								destroySensorRule callback
+								superDestroy callback
 					else
-						destroySensorRule callback
+						superDestroy callback
 	
 	###
-	# createIfSensor
+	# create
 	# ====
 	# Creates a SensorRule in the DB, if the sensor it is associated to exists.
 	# @param data (Object): 								Data defining the SensorRule
 	# @param callback (Function(Error, SensorRule):null): 	Callback
 	###
-	@createIfSensor: (data, callback) ->
+	@create: (data, callback) ->
+		superCreate = super
 		Sensor.find data.sensorId, (err, sensor) ->
 			if err
 				callback 'Sensor associated to this rule couldn\'t be found: '+err, null
@@ -64,4 +65,4 @@ module.exports = class SensorRule extends cozydb.CozyModel
 				callback 'Sensor associated to this rule doesn\'t exist', null
 				return
 			
-			SensorModel.create data, callback
+			superCreate data, callback
