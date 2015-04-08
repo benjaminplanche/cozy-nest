@@ -7,6 +7,9 @@
 
 cozydb = require 'cozydb'
 
+actuatorsDrivers = null # List of drivers supported by the system - Must be set when server starts.
+module.exports.setDrivers = (ref) -> actuatorsDrivers = ref
+
 module.exports = class Actuator extends cozydb.CozyModel
 	@schema:
 		customId: 	type : String		# not Empty
@@ -14,19 +17,29 @@ module.exports = class Actuator extends cozydb.CozyModel
 		type: 		type : String		# not Empty
 	
 	###
-	# destroyFromDBAndDriver
+	# apply
+	# ====
+	# Asks the actuator to apply the given value, using its driver as intermediate.
+	# @param value (String): 					Value to be applied
+	# @param callback (Function(Error):null): 	Callback
+	###
+	apply: (value, callback) ->
+		actuatorsDrivers[@type].apply @customId, value, callback
+	
+	###
+	# destroy
 	# ====
 	# Deletes the Actuator, both from the DB and Driver
-	# @param actuatorsDrivers (Driver[]): 			List of drivers supported by the system
 	# @param callback (Function(Error):null):		Callback
 	###
-	destroyFromDBAndDriver: (actuatorsDrivers, callback) ->
+	destroy: (callback) ->
+		superDestroy = super
 		actuatorsDrivers[@type].remove @customId, (err2) ->
 			if err2
 				callback err2
 			else
 				# Remove from DB:
-				@destroy (err3) ->
+				superDestroy (err3) ->
 					if err3
 						# Cancelling Modif:
 						actuatorsDrivers[@type].remove prevActuator.customId, id, (err2) ->
@@ -38,21 +51,21 @@ module.exports = class Actuator extends cozydb.CozyModel
 						callback null
 	
 	###
-	# updateAttributesForDBAndDriver
+	# updateAttributes
 	# ====
 	# Updates data about the Actuator, both for the DB and Driver
 	# @param data (dictionary): 						New data
-	# @param actuatorsDrivers (Driver[]): 				List of drivers supported by the system
 	# @param callback (Function(Error, Actuator):null):	Callback
 	###
 	# @todo Cover special case if "type" is changed -> Then the driver taking care of this device must be changed too!
-	updateAttributesForDBAndDriver: (data, actuatorsDrivers, callback) ->
+	updateAttributes: (data, callback) ->
+		superUpdateAttributes = super
 		prevData =
 			customId: @customId
 			name: @name
 			type: @type
 		# Update DB:
-		@updateAttributes data, (err, actuator) ->
+		superUpdateAttributes data, (err, actuator) ->
 			if err
 				callback err, actuator
 			else
@@ -60,7 +73,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 				actuatorsDrivers[@type].update prevData.customId, data.customId, (err2) ->
 					if err2
 						# Cancelling Modif:
-						@updateAttributes prevData, (err3, actuator2) ->
+						superUpdateAttributes prevData, (err3, actuator2) ->
 							if err3
 								callback 'Can\'t update Actuator in Driver & Can\'t reverse update in DB. Contact Admin (' + err2 + ' AND ' + err3 + ')', actuator2
 							else
@@ -68,61 +81,31 @@ module.exports = class Actuator extends cozydb.CozyModel
 					else
 						callback null, actuator
 	
-	
-	# ###
-	# # byId
-	# # ====
-	# # Gets an Actuator using its ID.
-	# # @param id (ID): 							ID
-	# # @param callback (Function(Error, Actuator):null): 	Callback
-	# ###
-	# @byId: (id, callback) ->
-		# param =
-			# key: [id]
-		# ActuatorModel.request 'byId', param, callback
-		
 	###
-	# getOrCreate
+	# create
 	# ====
-	# Gets an Actuator, or creates it if not found.
-	# @param data (Object): 								Data defining the actuator
-	# @param callback (Function(Error, Actuator, bool):null): Callback function. 2nd parameter is the found or created Actuator; 3rd parameter is a boolean set true if created / false if found.
-	###
-	@getOrCreate: (data, callback) ->
-		# customId + type is a primary key.
-		params = key: [accountID, type]
-		ActuatorModel.request "byCustomIdAndType", params, (err, actuators)->
-		if err
-			callback err, null, null
-		else if actuators.length is 0
-			callbackCreate = (err, actuator) ->
-				callback err, actuator, true
-			ActuatorModel.create data, callbackCreate
-		else # Actuator already exists.
-			callback err, actuators[0], false
-			
-	###
-	# createIfDriver
-	# ====
-	# Adds an actuator to the DB and system, if there is a driver to handle it.
-	# @param data (Object): 						Data defining the actuator
-	# @param actuatorsDrivers (Driver[]): 			List of drivers supported by the system
+	# Adds a actuator to the DB and system, if there is a driver to handle it. If a similar actuator already exists (same customId and type), then this actuator is returned.
+	# @param data (Object): 							Data defining the actuator
 	# @param callback (Function(Error, Actuator):null): 	Callback
 	###
-	@createIfDriver: (data, actuatorsDrivers, callback) ->
+	@create: (data, callback) ->
+		thisActuator = @
+		superCreate = super
 		if actuatorsDrivers[type] # If this kind of device is supported:
 			# Check if this actuator isn't already added (the combination type + customId should be unique):
-			Actuator.getOrCreate data, (err, actuator, created) ->
+			params = key: [data.accountID, data.type]
+			@request "byCustomIdAndType", params, (err, actuators)->
 				if err
-					callback err, actuator
-				else if !created
+					callback err, null
+				else if actuators.length isnt 0 # Actuator already exists.
 					callback 'Device already added', actuator
-				else	
-					# Let the driver handle the integration of the device to the system:
-					actuatorsDrivers[type].add customId, actuator.id, (err) ->
+				else
+					superCreate data, (err, actuator) ->
+						# Let the driver handle the integration of the device to the system:
+						actuatorsDrivers[type].add customId, actuator.id, (err) ->
 						if err
 							# Cancelling modif:
-							Actuator.requestDestroy "all", {key: actuator.id}, (err) ->
+							thisActuator.requestDestroy "all", {key: actuator.id}, (err) ->
 								callback err, null
 						else
 							callback null, actuator

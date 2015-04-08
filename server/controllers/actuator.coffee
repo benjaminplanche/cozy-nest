@@ -26,7 +26,7 @@ module.exports.read = (req, res) ->
 
 module.exports.create = (req, res) ->
 	data = req.body
-	Actuator.createIfDriver data, actuatorsDrivers, (err, actuator) ->
+	Actuator.create data, (err, actuator) ->
 		if err?
 			# @todo Special case when error is 'Device already added'?
 			res.send error: "Server error while creating actuator.", 500
@@ -35,14 +35,14 @@ module.exports.create = (req, res) ->
 
 module.exports.update = (req, res) ->
 	data = req.body
-	req.actuator.updateAttributesForDBAndDriver data, actuatorsDrivers, (err, actuator) ->
+	req.actuator.updateAttributes data, (err, actuator) ->
 		if err?
 			res.send error: "Server error while saving actuator", 500
 		else
 			res.send actuator, 200
 
 module.exports.delete = (req, res) ->
-	req.actuator.destroyFromDBAndDriver actuatorsDrivers, (err) ->
+	req.actuator.destroy (err) ->
 		if err?
 			res.send error: "Server error while deleting actuator", 500
 		else
