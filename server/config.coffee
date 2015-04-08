@@ -20,7 +20,7 @@ config =
 			# actuatorsDrivers = ...
 			# sensorsDrivers = ...
 
-			# Pass reference to controllers:
+			# @todo Pass their reference to controllers:
 			# require('./controllers/actuator').setDrivers actuatorsDrivers
 			# require('./controllers/sensor').setDrivers sensorsDrivers
 
