@@ -102,16 +102,20 @@ module.exports = class Sensor extends cozydb.CozyModel
 				if err
 					callback err, null
 				else if sensors.length isnt 0 # Sensor already exists.
-					callback 'Device already added', sensor
+					callback 'Device already added', sensors[0]
 				else
 					superCreate data, (err, sensor) ->
+						if err
+							callback err, null
+							return
+							
 						# Let the driver handle the integration of the device to the system:
 						sensorsDrivers[type].add customId, sensor.id, (err) ->
-						if err
-							# Cancelling modif:
-							thisSensor.requestDestroy "all", {key: sensor.id}, (err) ->
-								callback err, null
-						else
-							callback null, sensor
+							if err
+								# Cancelling modif:
+								thisSensor.requestDestroy "all", {key: sensor.id}, (err) ->
+									callback err, null
+							else
+								callback null, sensor
 		else
 			callback 'Device not supported', null
