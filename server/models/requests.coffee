@@ -13,6 +13,7 @@ bySensorAndType = (doc) -> emit [doc.sensorId, doc.type], doc
 bySensor = (doc) -> emit doc.sensorId, doc
 byActuator = (doc) -> emit doc.actuatorId, doc
 byRule = (doc) -> emit doc.ruleId, doc
+byName = (doc) -> emit doc.name, doc
 
 module.exports =
 	sensor:
@@ -40,4 +41,8 @@ module.exports =
 		'all': cozydb.defaultRequests.all
 		'byRule': byRule
 		'byActuator': byActuator
+	
+	driver:
+		'all': cozydb.defaultRequests.all
+		'byName': byName
 
