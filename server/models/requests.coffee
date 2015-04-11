@@ -7,22 +7,25 @@
 cozydb = require 'cozydb'
 
 
-byCustomIdAndType = (doc) -> emit [doc.customId, doc.type], doc
+byCustomIdAndDriver = (doc) -> emit [doc.customId, doc.driverId], doc
 bySensorAndTime = (doc) -> emit [doc.sensorId, doc.time], doc
 bySensorAndType = (doc) -> emit [doc.sensorId, doc.type], doc
 bySensor = (doc) -> emit doc.sensorId, doc
 byActuator = (doc) -> emit doc.actuatorId, doc
-byRule = (doc) -> emit doc.ruleId, doc
+byRule = (doc) -> emit doc.driverId, doc
+byDriver = (doc) -> emit doc.driverId, doc
 byName = (doc) -> emit doc.name, doc
 
 module.exports =
 	sensor:
 		'all': cozydb.defaultRequests.all
-		'byCustomIdAndType': byCustomIdAndType
+		'byCustomIdAndDriver': byCustomIdAndDriver
+		'byDriver': byDriver
 	
 	actuator:
 		'all': cozydb.defaultRequests.all
-		'byCustomIdAndType': byCustomIdAndType
+		'byCustomIdAndDriver': byCustomIdAndDriver
+		'byDriver': byDriver
 	
 	measure:
 		'all': cozydb.defaultRequests.all

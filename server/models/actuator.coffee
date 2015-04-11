@@ -14,7 +14,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 	@schema:
 		customId: 	type : String		# not Empty
 		name: 		type : String		# not Empty
-		type: 		type : String		# not Empty
+		driverId: 		type : String		# not Empty
 	
 	###
 	# apply
@@ -24,7 +24,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 	# @param callback (Function(Error):null): 	Callback
 	###
 	apply: (value, callback) ->
-		actuatorsDrivers[@type].apply @customId, value, callback
+		actuatorsDrivers[@driverId].apply @customId, value, callback
 	
 	###
 	# destroy
@@ -34,7 +34,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 	###
 	destroy: (callback) ->
 		superDestroy = super
-		actuatorsDrivers[@type].remove @customId, (err2) ->
+		actuatorsDrivers[@driverId].remove @customId, (err2) ->
 			if err2
 				callback err2
 			else
@@ -42,7 +42,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 				superDestroy (err3) ->
 					if err3
 						# Cancelling Modif:
-						actuatorsDrivers[@type].remove prevActuator.customId, id, (err2) ->
+						actuatorsDrivers[@driverId].remove prevActuator.customId, id, (err2) ->
 							if err2
 								callback 'Device removed from system but not DB. Contact Admin (' + err3 + ' AND ' + err2 + ')'
 							else 
@@ -57,20 +57,19 @@ module.exports = class Actuator extends cozydb.CozyModel
 	# @param data (dictionary): 						New data
 	# @param callback (Function(Error, Actuator):null):	Callback
 	###
-	# @todo Cover special case if "type" is changed -> Then the driver taking care of this device must be changed too!
 	updateAttributes: (data, callback) ->
 		superUpdateAttributes = super
 		prevData =
 			customId: @customId
 			name: @name
-			type: @type
+			driverId: @driverId
 		# Update DB:
 		superUpdateAttributes data, (err, actuator) ->
 			if err
 				callback err, actuator
 			else
 				# Update Driver:	
-				actuatorsDrivers[@type].update prevData.customId, data.customId, (err2) ->
+				actuatorsDrivers[@driverId].update prevData.customId, data.customId, (err2) ->
 					if err2
 						# Cancelling Modif:
 						superUpdateAttributes prevData, (err3, actuator2) ->
@@ -82,19 +81,30 @@ module.exports = class Actuator extends cozydb.CozyModel
 						callback null, actuator
 	
 	###
+	# byDriver
+	# ====
+	# Finds drivers by their name.
+	# @param driver (Driver): 								Driver
+	# @param callback (Function(Error, Actuator[]):null): 	Callback
+	###	
+	@byDriver = (driver, callback) ->
+		@request 'byDriver', key: driver.id, callback
+		
+		
+	###
 	# create
 	# ====
-	# Adds a actuator to the DB and system, if there is a driver to handle it. If a similar actuator already exists (same customId and type), then this actuator is returned.
+	# Adds a actuator to the DB and system, if there is a driver to handle it. If a similar actuator already exists (same customId and driverId), then this actuator is returned.
 	# @param data (Object): 							Data defining the actuator
 	# @param callback (Function(Error, Actuator):null): 	Callback
 	###
 	@create: (data, callback) ->
 		thisActuator = @
 		superCreate = super
-		if actuatorsDrivers[type] # If this kind of device is supported:
-			# Check if this actuator isn't already added (the combination type + customId should be unique):
-			params = key: [data.accountID, data.type]
-			@request "byCustomIdAndType", params, (err, actuators)->
+		if actuatorsDrivers[data.driverId] # If this kind of device is supported:
+			# Check if this actuator isn't already added (the combination driverId + customId should be unique):
+			params = key: [data.accountID, data.driverId]
+			@request "byCustomIdAndDriver", params, (err, actuators)->
 				if err
 					callback err, null
 				else if actuators.length isnt 0 # Actuator already exists.
@@ -106,7 +116,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 							return
 						
 						# Let the driver handle the integration of the device to the system:
-						actuatorsDrivers[type].add customId, actuator.id, (err) ->
+						actuatorsDrivers[driverId].add customId, actuator.id, (err) ->
 							if err
 								# Cancelling modif:
 								thisActuator.requestDestroy "all", {key: actuator.id}, (err) ->
