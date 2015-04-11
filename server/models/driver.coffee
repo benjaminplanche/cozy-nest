@@ -14,12 +14,17 @@ cozydb = require 'cozydb'
 
 const DRIVERS_DIR = '../drivers/'
 
+actuatorsDrivers = null
 sensorsDrivers = null # List of drivers supported by the system - Must be set when server starts.
-module.exports.setDrivers = (ref) -> sensorsDrivers = ref
+module.exports.setDrivers = (refS, refA) -> 
+	sensorsDrivers = refS
+	actuatorsDrivers = refA
 
 module.exports = class Driver extends cozydb.CozyModel
 	@schema:
 		name: 		type : String		# not Empty
+		isActuator:	type : Boolean		# not Empty
+		isSensor:	type : Boolean		# not Empty
 		
 	
 	###
@@ -125,7 +130,10 @@ module.exports = class Driver extends cozydb.CozyModel
 						# Initialize the driver:
 						unless driverModule = require dirName + file.name
 							callback 'Couldn\'t find module', null
-						unless driverModule.add and driverModule.remove and driver.update and driver.init and driver.apply
+						unless isActuator = driverModule.isActuator or isSensor = driverModule.isSensor # or (!isActuator and !isSensor)
+							callback 'Driver not defining if for Sensors and/or Actuators', null
+							
+						unless driverModule.add and driverModule.remove and driver.update and driver.apply and (!isActuator or driver.init)
 							callback 'Driver not implementing the interface', null
 							
 						driverModule.init (err) ->
@@ -135,4 +143,13 @@ module.exports = class Driver extends cozydb.CozyModel
 								# If everything worked, save the Driver instance in DB:
 								data =
 									name: file.name
-								superCreate data, callback
+									isSensor: isSensor
+									isActuator: isActuator
+								superCreate data, (err, driver) ->
+									if err
+										callback 'Error saving the driver in DB', null
+									else
+										sensorsDrivers[driver.name] = driverModule if driver.isSensor
+										actuatorsDrivers[driver.name] = driverModule if driver.isActuator
+										callback null, driver
+								
