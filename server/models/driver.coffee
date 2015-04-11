@@ -128,7 +128,7 @@ module.exports = class Driver extends cozydb.CozyModel
 				callback 'Driver already added', drivers[0]
 			else
 				# Create directory for the driver's files:
-				dirName = DRIVERS_DIR+file.name
+				dirName = DRIVERS_DIR + file.name + "/"
 				mkdirp(dirName, (err) ->
 					if err
 						callback 'Error creating the directory for the driver', null
@@ -175,4 +175,47 @@ module.exports = class Driver extends cozydb.CozyModel
 										sensorsDrivers[driver.id] = driverModule if driver.isSensor
 										actuatorsDrivers[driver.id] = driverModule if driver.isActuator
 										callback null, driver
-								
+	
+	###
+	# reinit
+	# ====
+	# Re-initializes the drivers and their devices
+	# @param callback (Function(Error):null): 	Callback
+	###
+	@reinit: (callback) ->
+		@request 'all', (err, drivers)
+			return callback err if err
+			
+			# Clearing the previous drivers arrays (without changing the ref!)
+			for k,v in sensorsDrivers
+				delete sensorsDrivers[k] if sensorsDrivers.hasOwnProperty(k)
+			for k,v in actuatorsDrivers
+				delete actuatorsDrivers[k] if actuatorsDrivers.hasOwnProperty(k)
+			
+			# Refilling them:
+			for driver in drivers
+				driverModule = require (DRIVERS_DIR + file.name + "/" + file.name) 
+				driverModule.init (err) ->
+					return callback 'Error initializing the drivers' if err
+					
+					sensorsDrivers[driver.id] = driverModule if driver.isSensor
+					actuatorsDrivers[driver.id] = driverModule if driver.isActuator
+			
+			# Readding the devices per driver:
+			async.parallel([
+				(cb) ->
+					Sensor.request 'all', (err, sensors) ->
+						return cb err, null if err
+						
+						async.each sensors, (sensor, cb2) ->
+							sensorsDrivers[sensor.driverId].add sensor.customId, sensor.id, cb2
+						, cb
+				, (cb) ->
+					Actuator.request 'all', (err, actuators) ->
+						return cb err, null if err
+						
+						async.each actuators, (actuator, cb2) ->
+							sensorsDrivers[actuator.driverId].add actuator.customId, actuator.id, cb2
+						, cb
+			], (err, results) -> callback err
+						
