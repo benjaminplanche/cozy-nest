@@ -10,7 +10,12 @@ multiparty = require 'multiparty'
 path = require 'path'
 mkdirp = require 'mkdirp'
 decompress = require 'decompress'
+async = require 'async'
+rimraf = require 'rimraf'
 cozydb = require 'cozydb'
+
+Sensor = require './sensor'
+Actuator = require './actuator'
 
 const DRIVERS_DIR = '../drivers/'
 
@@ -35,28 +40,46 @@ module.exports = class Driver extends cozydb.CozyModel
 	###
 	destroy: (callback) ->
 		superDestroy = super
-		### 
-		# Find if there are still sensors depending on this driver:
+		thisDriver = @
 		
-			# If yes, return an error:
-			
-			# Else stop the driver and delete it (files + instance in DB):
-			
-		sensorsDrivers[@type].remove @customId, (err2) ->
-			if err2
-				callback err2
+		# Find if there are still devices depending on this driver:
+		async.parallel [
+			(cb) ->
+				if thisDriver.isSensor
+					# @todo Perf: use a request Sensor.countByDriver (with a reduce) instead?
+					Sensor.byDriver thisDriver (err, sensors) ->
+						cb err, sensors?.length
+				else cb null, 0
+			,
+			(cb) ->
+				if thisDriver.isActuator
+					# @todo Perf: use a request Actuator.countByDriver (with a reduce) instead?
+					Actuator.byDriver thisDriver (err, actuators) ->
+						cb err, actuators?.length
+				else cb null, 0
+		 ], (err, results) ->
+			if err
+				callback 'DB Error'
+			else if (results[0] + results[1]) > 0
+				callback 'Devices still using this driver'
 			else
-				# Remove from DB:
-				superDestroy (err3) ->
-					if err3
-						# Cancelling Modif:
-						sensorsDrivers[@type].remove prevDriver.customId, id, (err2) ->
-							if err2
-								callback 'Device removed from system but not DB. Contact Admin (' + err3 + ' AND ' + err2 + ')'
-							else
-								callback err3
-					else
-						callback null ###
+				# Stop the driver and delete it (files + instance in DB):
+				async.parallel [
+					(cb) -> superDestroy ((err) -> cb 'Error removing driver from DB', null)
+					,
+					(cb) -> rimraf (DRIVERS_DIR + thisDriver.name), ((err) -> cb 'Error removing driver\'s files', null)
+					,
+					(cb) -> 
+						err = null
+						try
+							delete sensorsDrivers[thisDriver.id] if thisDriver.isSensor
+							delete actuatorsDrivers[thisDriver.id] if thisDriver.isActuator
+						catch e
+							err = 'Error removing driver\'s module'
+						finally
+							cb err, null
+				], (err, results) ->
+					callback err
 	
 	###
 	# updateAttributes
@@ -76,7 +99,7 @@ module.exports = class Driver extends cozydb.CozyModel
 	# @param name (string): 								Name
 	# @param callback (Function(Error, Driver[]):null): 	Callback
 	###	
-	@byCalendar = (name, callback) ->
+	@byName = (name, callback) ->
 		@request 'byName', key: name, callback
 
 	###
@@ -149,7 +172,7 @@ module.exports = class Driver extends cozydb.CozyModel
 									if err
 										callback 'Error saving the driver in DB', null
 									else
-										sensorsDrivers[driver.name] = driverModule if driver.isSensor
-										actuatorsDrivers[driver.name] = driverModule if driver.isActuator
+										sensorsDrivers[driver.id] = driverModule if driver.isSensor
+										actuatorsDrivers[driver.id] = driverModule if driver.isActuator
 										callback null, driver
 								
