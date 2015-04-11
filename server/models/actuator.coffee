@@ -98,16 +98,20 @@ module.exports = class Actuator extends cozydb.CozyModel
 				if err
 					callback err, null
 				else if actuators.length isnt 0 # Actuator already exists.
-					callback 'Device already added', actuator
+					callback 'Device already added', actuators[0]
 				else
 					superCreate data, (err, actuator) ->
+						if err
+							callback err, null
+							return
+						
 						# Let the driver handle the integration of the device to the system:
 						actuatorsDrivers[type].add customId, actuator.id, (err) ->
-						if err
-							# Cancelling modif:
-							thisActuator.requestDestroy "all", {key: actuator.id}, (err) ->
-								callback err, null
-						else
-							callback null, actuator
+							if err
+								# Cancelling modif:
+								thisActuator.requestDestroy "all", {key: actuator.id}, (err) ->
+									callback err, null
+							else
+								callback null, actuator
 		else
 			callback 'Device not supported', null
