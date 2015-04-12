@@ -1,14 +1,14 @@
 {
-  "name": "cozy-template",
-  "version": "1.0.0",
+  "name": "cozy-nest",
+  "version": "0.0.1",
   "engines": [
     "node = 0.10.x"
   ],
-  "description": "A template project for cozy applications",
+  "description": "Home Automation App for Cozy",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/cozy/cozy-template-coffee.git"
+    "url": "https://github.com/Aldream/cozy-nest"
   },
   "main": "server.coffee",
   "dependencies": {
