@@ -19,10 +19,9 @@ module.exports = class ActuatorRule extends cozydb.CozyModel
 	# apply
 	# ====
 	# Applies the ActuatorRule, sending a request to the corresponding Actuator using its Driver.
-	# @param actuatorsDrivers (Driver[]): 		List of drivers supported by the system
 	# @param callback (Function(Error):null): 	Callback
 	###
-	apply: (actuatorsDrivers, callback) ->
+	apply: (callback) ->
 		if !@isActive
 			actuatorRule = @
 			Actuator.find @actuatorId (err, actuator)->
@@ -32,23 +31,25 @@ module.exports = class ActuatorRule extends cozydb.CozyModel
 				if !actuator
 					callback 'Actuator associated to ActuatorRule #'+actuatorRule.id+' not found: '+err
 					return
-				actuatorsDrivers[actuator.type].apply actuator.customId, actuatorRule.value, (err) ->
+					
+				actuator.apply actuatorRule.value, (err) ->
 					if err
 						callback 'Error while sending request to the Actuator associated to ActuatorRule #'+actuatorRule.id+': '+err
-						return
-					actuatorRule.updateAttributes isActive: true, callback
+					else
+						actuatorRule.updateAttributes isActive: true, callback
 		else
 			callback null
 	
 	###
-	# createIfActuator
+	# create
 	# ====
 	# Creates an ActuatorRule in the DB, if the actuator it is associated to exists.
 	# @param data (Object): 								Data defining the ActuatorRule
-	# @param callback (Function(Error, SensorRule):null): 	Callback
+	# @param callback (Function(Error, ActuatorRule):null): Callback
 	###
-	@createIfSensor: (data, callback) ->
-		Actuator.find data.sensorId, (err, actuator) ->
+	@create: (data, callback) ->
+		superCreate = super
+		Actuator.find data.actuatorId, (err, actuator) ->
 			if err
 				callback 'Actuator associated to this rule couldn\'t be found: '+err, null
 				return
@@ -56,4 +57,4 @@ module.exports = class ActuatorRule extends cozydb.CozyModel
 				callback 'Actuator associated to this rule doesn\'t exist', null
 				return
 			
-			ActuatorRuleModel.create data, callback
+			superCreate data, callback

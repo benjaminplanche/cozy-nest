@@ -8,29 +8,32 @@
 cozydb = require 'cozydb'
 Measure = require './measure'
 
+sensorsDrivers = null # List of drivers supported by the system - Must be set when server starts.
+module.exports.setDrivers = (ref) -> sensorsDrivers = ref
+
 module.exports = class Sensor extends cozydb.CozyModel
 	@schema:
 		customId:	type : String		# not Empty
 		name: 		type : String		# not Empty
-		type: 		type : String		# not Empty
+		driverId: 	type : String		# not Empty
 	
 	###
-	# destroyFromDBAndDriver
+	# destroy
 	# ====
 	# Deletes the Sensor, both from the DB and Driver
-	# @param sensorsDrivers (Driver[]): 			List of drivers supported by the system
 	# @param callback (Function(Error):null):		Callback
 	###
-	destroyFromDBAndDriver: (sensorsDrivers, callback) ->
-		sensorsDrivers[@type].remove @customId, (err2) ->
+	destroy: (callback) ->
+		superDestroy = super
+		sensorsDrivers[@driverId].remove @customId, (err2) ->
 			if err2
 				callback err2
 			else
 				# Remove from DB:
-				@destroy (err3) ->
+				superDestroy (err3) ->
 					if err3
 						# Cancelling Modif:
-						sensorsDrivers[@type].remove prevSensor.customId, id, (err2) ->
+						sensorsDrivers[@driverId].remove prevSensor.customId, id, (err2) ->
 							if err2
 								callback 'Device removed from system but not DB. Contact Admin (' + err3 + ' AND ' + err2 + ')'
 							else
@@ -39,29 +42,28 @@ module.exports = class Sensor extends cozydb.CozyModel
 						callback null
 	
 	###
-	# updateAttributesForDBAndDriver
+	# updateAttributes
 	# ====
 	# Updates data about the Sensor, both for the DB and Driver
 	# @param data (dictionary): 						New data
-	# @param sensorsDrivers (Driver[]): 				List of drivers supported by the system
 	# @param callback (Function(Error, Sensor):null):	Callback
 	###
-	# @todo Cover special case if "type" is changed -> Then the driver taking care of this device must be changed too!
-	updateAttributesForDBAndDriver: (data, sensorsDrivers, callback) ->
+	updateAttributes: (data, callback) ->
 		prevData =
 			customId: @customId
 			name: @name
-			type: @type
+			driverId: @driverId
+		superUpdateAttributes = super
 		# Update DB:
-		@updateAttributes data, (err, sensor) ->
+		superUpdateAttributes data, (err, sensor) ->
 			if err
 				callback err, sensor
 			# Update Driver:	
 			else
-				sensorsDrivers[@type].update prevData.customId, data.customId, (err2) ->
+				sensorsDrivers[@driverId].update prevData.customId, data.customId, (err2) ->
 					if err2
 						# Cancelling Modif:
-						@updateAttributes prevData, (err3, sensor2) ->
+						superUpdateAttributes prevData, (err3, sensor2) ->
 							if err3
 								callback 'Can\'t update Sensor in Driver & Can\'t reverse update in DB. Contact Admin (' + err2 + ' AND ' + err3 + ')', sensor2
 								return
@@ -81,64 +83,49 @@ module.exports = class Sensor extends cozydb.CozyModel
 		sanitize data
 		data.sensorId = @id
 		Measure.create data callback
-		
 	
-	# ###
-	# # byId
-	# # ====
-	# # Gets a Sensor using its ID.
-	# # @param id (ID): 							ID
-	# # @param callback (Function(Error, Sensor):null): 	Callback
-	# ###
-	# @byId: (id, callback) ->
-		# param =
-			# key: [id]
-		# SensorModel.request 'byId', param, callback
+	
+	###
+	# byDriver
+	# ====
+	# Finds drivers by their name.
+	# @param driver (Driver): 								Driver
+	# @param callback (Function(Error, Sensor[]):null): 	Callback
+	###	
+	@byDriver = (driver, callback) ->
+		@request 'byDriver', key: driver.id, callback
 		
 	###
-	# getOrCreate
+	# create
 	# ====
-	# Gets a Sensor, or creates it if not found.
-	# @param data (Object): 								Data defining the sensor
-	# @param callback (Function(Error, Sensor, bool):null): Callback function. 2nd parameter is the found or created Sensor; 3rd parameter is a boolean set true if created / false if found.
-	###
-	@getOrCreate: (data, callback) ->
-		# customId + type is a primary key.
-		params = key: [accountID, type]
-		SensorModel.request "byCustomIdAndType", params, (err, sensors)->
-		if err
-			callback err, null, null
-		else if sensors.length is 0
-			callbackCreate = (err, sensor) ->
-				callback err, sensor, true
-			SensorModel.create data, callbackCreate
-		else # Sensor already exists.
-			callback err, sensors[0], false
-			
-	###
-	# createIfDriver
-	# ====
-	# Adds a sensor to the DB and system, if there is a driver to handle it.
-	# @param data (Object): 						Data defining the sensor
-	# @param sensorsDrivers (Driver[]): 			List of drivers supported by the system
+	# Adds a sensor to the DB and system, if there is a driver to handle it. If a similar sensor already exists (same customId and driverId), then this sensor is returned.
+	# @param data (Object): 							Data defining the sensor
 	# @param callback (Function(Error, Sensor):null): 	Callback
 	###
-	@createIfDriver: (data, sensorsDrivers, callback) ->
-		if sensorsDrivers[type] # If this kind of device is supported:
-			# Check if this sensor isn't already added (the combination type + customId should be unique):
-			Sensor.getOrCreate data, (err, sensor, created) ->
+	@create: (data, callback) ->
+		thisSensor = @
+		superCreate = super
+		if sensorsDrivers[data.driverId] # If this kind of device is supported:
+			# Check if this sensor isn't already added (the combination driverId + customId should be unique):
+			params = key: [data.accountID, data.driverId]
+			@request "byCustomIdAndDriver", params, (err, sensors)->
 				if err
-					callback err, sensor
-				else if !created
-					callback 'Device already added', sensor
-				# Let the driver handle the integration of the device to the system:
+					callback err, null
+				else if sensors.length isnt 0 # Sensor already exists.
+					callback 'Device already added', sensors[0]
 				else
-					sensorsDrivers[type].add customId, sensor.id, (err) ->
+					superCreate data, (err, sensor) ->
 						if err
-							# Cancelling modif:
-							Sensor.requestDestroy "all", {key: sensor.id}, (err) ->
-								callback err, null
-						else
-						callback null, sensor
+							callback err, null
+							return
+							
+						# Let the driver handle the integration of the device to the system:
+						sensorsDrivers[driverId].add customId, sensor.id, (err) ->
+							if err
+								# Cancelling modif:
+								thisSensor.requestDestroy "all", {key: sensor.id}, (err) ->
+									callback err, null
+							else
+								callback null, sensor
 		else
 			callback 'Device not supported', null

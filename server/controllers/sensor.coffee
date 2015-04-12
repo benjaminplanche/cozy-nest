@@ -26,7 +26,7 @@ module.exports.read = (req, res) ->
 
 module.exports.create = (req, res) ->
 	data = req.body
-	Sensor.createIfDriver data, sensorsDrivers, (err, sensor) ->
+	Sensor.create data, (err, sensor) ->
 		if err?
 			if err == 'Device already added'
 				res.send sensor, 202
@@ -45,14 +45,14 @@ module.exports.createMeasure = (req, res) ->
 
 module.exports.update = (req, res) ->
 	data = req.body
-	req.sensor.updateAttributesForDBAndDriver data, sensorsDrivers, (err, sensor) ->
+	req.sensor.updateAttributes data, (err, sensor) ->
 		if err?
 			res.send error: 'Server error while saving sensor', 500
 		else
 			res.send sensor, 200
 
 module.exports.delete = (req, res) ->
-	req.sensor.destroyFromDBAndDriver sensorsDrivers, (err) ->
+	req.sensor.destroy (err) ->
 		if err?
 			res.send error: 'Server error while deleting sensor', 500
 		else
