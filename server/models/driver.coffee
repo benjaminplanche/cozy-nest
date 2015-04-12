@@ -17,7 +17,7 @@ cozydb = require 'cozydb'
 Sensor = require './sensor'
 Actuator = require './actuator'
 
-const DRIVERS_DIR = '../drivers/'
+DRIVERS_DIR = '../drivers/'
 
 actuatorsDrivers = null
 sensorsDrivers = null # List of drivers supported by the system - Must be set when server starts.
