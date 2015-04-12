@@ -129,7 +129,7 @@ module.exports = class Driver extends cozydb.CozyModel
 			else
 				# Create directory for the driver's files:
 				dirName = DRIVERS_DIR + file.name + "/"
-				mkdirp(dirName, (err) ->
+				mkdirp dirName, (err) ->
 					if err
 						callback 'Error creating the directory for the driver', null
 						return
@@ -183,7 +183,7 @@ module.exports = class Driver extends cozydb.CozyModel
 	# @param callback (Function(Error):null): 	Callback
 	###
 	@reinit: (callback) ->
-		@request 'all', (err, drivers)
+		@request 'all', (err, drivers) ->
 			return callback err if err
 			
 			# Clearing the previous drivers arrays (without changing the ref!)
@@ -202,7 +202,7 @@ module.exports = class Driver extends cozydb.CozyModel
 					actuatorsDrivers[driver.id] = driverModule if driver.isActuator
 			
 			# Readding the devices per driver:
-			async.parallel([
+			async.parallel [
 				(cb) ->
 					Sensor.request 'all', (err, sensors) ->
 						return cb err, null if err

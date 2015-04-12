@@ -5,12 +5,12 @@
 # Operations on Drivers.
 ###
 
-logger = require 'printit'
+logger = require('printit')
 	prefix: 'driver'
 	
 Driver = require '../models/driver'
 
-const DRIVERS_DIR = '../drivers/'
+DRIVERS_DIR = '../drivers/'
 
 module.exports.fetch = (req, res, next, id) ->
 	Driver.find id, (err, driver) ->
