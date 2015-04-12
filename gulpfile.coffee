@@ -1,6 +1,7 @@
 gulp = require 'gulp'
 # browserify = require 'browserify'
 # buffer = require 'vinyl-buffer'
+gutil = require 'gulp-util'
 coffee = require 'gulp-coffee'
 clean = require 'gulp-clean'
 mocha = require 'gulp-mocha'
@@ -12,6 +13,14 @@ logger = require('printit')
 	prefix: 'gulp'
 
 BUILDDIR = 'build/'
+
+watching = false
+handleError = (err) ->
+	logger.error err.toString
+	if watching
+		this.emit 'end'
+	else
+		process.exit 1
 
 
 gulp.task 'default', ['b']
@@ -54,16 +63,16 @@ gulp.task 'build-server', () ->
 	
 	rm [BUILDDIR + 'server/', 'server.js']
 
-	gulp.src 'server/**/*.coffee'
-	 .pipe coffee .on 'error', logger.error
-	 .pipe gulp.dest BUILDDIR + 'server/'
+	gulp.src('server/**/*.coffee')
+	 .pipe(coffee({bare: true}).on('error', gutil.log))
+	 .pipe(gulp.dest BUILDDIR + 'server/')
 	
-	gulp.src 'server.coffee'
-	 .pipe coffee .on 'error', logger.error
-	 .pipe gulp.dest BUILDDIR
+	gulp.src('server.coffee')
+	 .pipe(coffee({bare: true}).on('error', gutil.log))
+	 .pipe(gulp.dest BUILDDIR)
 
-	gulp.src 'package.json'
-	 .pipe gulp.dest BUILDDIR
+	gulp.src('package.json')
+	 .pipe(gulp.dest BUILDDIR)
 
 	logger.info "Compilation succeeded."
 
@@ -85,13 +94,13 @@ gulp.task 'test-server', () ->
 	logger.info "Start testing server..."
 	
 	gulp.src ['tests/controllers/*.coffee'], read: false
-	 .pipe mocha reporter: 'spec'
-	  .on 'error', console.log.bind(console)
+	 .pipe(mocha({reporter: 'spec'}).on('error', gutil.log))
 
 	logger.info "Testing server done."
 
 
 gulp.task 'w', ['test-client', 'test-server'], () ->	# watch
+	watching = true
 	gulp.watch ['client/**/*.js', 'static/**/*'], ['test-client']
 	gulp.watch ['server/**/*.coffee', 'server.coffee', 'tests/**/*'], ['test-server']
 	
