@@ -15,8 +15,7 @@ module.exports.start = start = (options, callback) ->
 	options.port ?= process.env.PORT or 9250
 	options.host = process.env.HOST or '127.0.0.1'
 
-	americano.start options, (err, app, server) ->
-		return callback err if err
+	americano.start options, (app, server) ->
 		
 		module.exports.app = app
 		cb?(null, app, server)
