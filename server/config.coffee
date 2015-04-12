@@ -1,5 +1,5 @@
 americano = require 'americano'
-Realtimer = require 'cozy-realtime-adapter'
+RealtimeAdapter = require 'cozy-realtime-adapter'
 
 config =
     common: 

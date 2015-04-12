@@ -24,16 +24,14 @@ module.exports =
     prefix: prefix
 
     startServer: (done) ->
-        @timeout 6000
+        @timeout 10000
         option =
             host: 'localhost'
             port: TESTPORT
         start = require("#{prefix}server").start
         start option, (app, server) =>
-            console.log('APP: ' + app)
-            console.log('SERVER: ' + server)
             @server = server
-            done err
+            done null
 
     killServer: ->
         @server.close()
@@ -46,10 +44,8 @@ module.exports =
 
     createSensor: (data) ->
         (done) ->
-            console.log 'CREATING SENSOR'
             baseSensor = new Sensor(data)
             Sensor.create baseSensor, (err, sensor) =>
-                console.log 'CREATED SENSOR'
                 @sensor = sensor
                 done err
 
@@ -61,9 +57,6 @@ module.exports =
 
         callbackFactory = (done) -> (error, response, body) =>
             return done error if error
-            console.log("ERROR: " + error)
-            console.log("RESPONSE: " + response)
-            console.log("BODY: " + body)
             store.response = response
             store.body = body
             done()

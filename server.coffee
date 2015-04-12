@@ -18,7 +18,7 @@ module.exports.start = start = (options, callback) ->
 	americano.start options, (app, server) ->
 		
 		module.exports.app = app
-		cb?(null, app, server)
+		callback?(app, server)
 
 
 	if not module.parent
