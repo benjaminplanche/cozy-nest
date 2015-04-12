@@ -1,29 +1,29 @@
 gulp = require 'gulp'
-browserify = require 'browserify'
-buffer = require 'vinyl-buffer'
+# browserify = require 'browserify'
+# buffer = require 'vinyl-buffer'
 coffee = require 'gulp-coffee'
 clean = require 'gulp-clean'
 mocha = require 'gulp-mocha'
 rm = require 'del'
 source = require 'vinyl-source-stream'
 
-logger = require 'printit'
+logger = require('printit')
 	date: false
 	prefix: 'gulp'
 
-const BUILDDIR = 'build/'
+BUILDDIR = 'build/'
 
 
 gulp.task 'default', ['b']
-gulp.task 'b' /* build */, ['build-client', 'build-server']
-gulp.task 't' /* test */, ['test-client', 'test-server']
+gulp.task 'b' , ['build-client', 'build-server']	# build
+gulp.task 't' , ['test-client', 'test-server']		# test
 
 	 
 gulp.task 'build-client', () ->
 	logger.options.prefix = 'gulp:build-client'
 	logger.info "Start compilation..."
 
-	# rm BUILDDIR + 'client/'
+	# rm BUILDDIR + 'client/' 
 
 	# gulp.src 'static/**/*'
 	 # .pipe gulp.dest BUILDDIR + 'client/'
@@ -86,12 +86,12 @@ gulp.task 'test-server', () ->
 	
 	gulp.src ['tests/controllers/*.coffee'], read: false
 	 .pipe mocha reporter: 'spec'
-	  .on 'error', logger.error
+	  .on 'error', console.log.bind(console)
 
 	logger.info "Testing server done."
 
 
-gulp.task 'w' /* watch */, ['test-client', 'test-server'], () ->
+gulp.task 'w', ['test-client', 'test-server'], () ->	# watch
 	gulp.watch ['client/**/*.js', 'static/**/*'], ['test-client']
 	gulp.watch ['server/**/*.coffee', 'server.coffee', 'tests/**/*'], ['test-server']
 	
