@@ -9,17 +9,17 @@ module.exports =
 	supportedSensor1:
 		customId: "ID1"
 		name: "Supported Sensor #1"
-		type: "TestSensor"
+		driverId: null
 		
 	supportedSensor2:
 		customId: "ID2"
 		name: "Supported Sensor #2"
-		type: "TestSensor"
+		driverId: null
 		
 	unsupportedSensor:
 		customId: "ID0"
 		name: "Unsupported Sensor"
-		type: "UnknownType"
+		driverId: "UnknownType"
 		
 	validUpdateForTestSensor:
 		customId: "ID42"
