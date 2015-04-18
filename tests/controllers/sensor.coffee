@@ -5,7 +5,8 @@
 # Testing the Sensors Controller.
 ###
 
-fixtures = require '../fixtures/sensor'
+fixturesSensor = require '../fixtures/sensor'
+fixturesDriver = require '../fixtures/driver'
 fs = require 'fs'
 helpers = require '../helpers'
 expect = require('chai').expect
@@ -16,14 +17,18 @@ store = {}
 describe 'Sensors Controller', ->
 
     before helpers.clearDB
-
     before helpers.startServer
     before helpers.makeTestClient
+    before helpers.createDriver fixturesDriver.basicSensorDriver.file
+
     after  helpers.killServer
 
     describe 'When we create a Sensor (POST /sensors) which is supported by a Driver', ->
 
-        sensor = fixtures.supportedSensor1
+        before (done) ->
+	        sensor = fixturesSensor.supportedSensor1
+	        sensor.driverId = @driver.id
+	        done null
 
         it 'should allow requests', (done) ->
             @client.post 'sensors', sensor, done
@@ -33,15 +38,18 @@ describe 'Sensors Controller', ->
             expect(@response.statusCode).to.equal 201
             expect(@body.customId).to.equal sensor.customId
             expect(@body.name).to.equal sensor.name
-            expect(@body.type).to.equal sensor.type
+            expect(@body.driverId).to.equal sensor.driverId
             expect(@body.id).to.exist
             store.sensorId = @body.id
             store.sensorName = @body.name
 
-    describe 'When we try creating a 2nd Sensor (POST /sensors) with the same type and customId', ->
+    describe 'When we try creating a 2nd Sensor (POST /sensors) with the same driver and customId', ->
 
-        sensor = fixtures.supportedSensor1
-        sensor.name = 'Different Name' # name is not taken into account to evaluate similarity.
+        before (done) ->
+	        sensor = fixturesSensor.supportedSensor1
+	        sensor.driverId = @driver.id
+	        sensor.name = 'Different Name' # name is not taken into account to evaluate similarity.
+	        done null
 
         it 'should allow requests', (done) ->
             @client.post 'sensors', sensor, done
@@ -51,12 +59,12 @@ describe 'Sensors Controller', ->
             expect(@response.statusCode).to.equal 202
             expect(@body.customId).to.equal sensor.customId
             expect(@body.name).to.equal store.sensorName
-            expect(@body.type).to.equal sensor.type
+            expect(@body.driverId).to.equal sensor.driverId
             expect(@body.id).to.equal store.sensorId
 
     describe 'When we try creating a Sensor (POST /sensors) which isn\'t supported by a Driver', ->
 
-        sensor = fixtures.unsupportedSensor
+        sensor = fixturesSensor.unsupportedSensor
 
         it 'should allow requests', (done) ->
             @client.post 'sensors', sensor, done
@@ -75,9 +83,9 @@ describe 'Sensors Controller', ->
 
         it 'should reply with the corresponding sensor', ->
             expect(@err).to.not.exist
-            expect(@body.customId).to.equal fixtures.supportedSensor1.customId
-            expect(@body.name).to.equal fixtures.supportedSensor1.sensorName
-            expect(@body.type).to.equal fixtures.supportedSensor1.type
+            expect(@body.customId).to.equal fixturesSensor.supportedSensor1.customId
+            expect(@body.name).to.equal fixturesSensor.supportedSensor1.sensorName
+            expect(@body.driverId).to.equal @driver.id
             expect(@body.id).to.equal store.sensorId
 
             
@@ -95,7 +103,7 @@ describe 'Sensors Controller', ->
 
     describe 'When we update a Sensor (PUT /sensors/:id) with data considered valid by its Driver', ->
 
-        update = fixtures.validUpdateForTestSensor
+        update = fixturesSensor.validUpdateForTestSensor
 
         it 'should allow requests', (done) ->
             @client.put "sensors/#{store.sensorId}", update, done
@@ -103,9 +111,9 @@ describe 'Sensors Controller', ->
         it 'should reply with the updated sensor', ->
             expect(@err).to.not.exist
             expect(@response.statusCode).to.equal 200
-            expect(@body.customId).to.equal fixtures.validUpdateForTestSensor.customId
-            expect(@body.name).to.equal fixtures.validUpdateForTestSensor.sensorName
-            expect(@body.type).to.equal fixtures.validUpdateForTestSensor.type
+            expect(@body.customId).to.equal fixturesSensor.validUpdateForTestSensor.customId
+            expect(@body.name).to.equal fixturesSensor.validUpdateForTestSensor.sensorName
+            expect(@body.driverId).to.equal @driver.id
             expect(@body.id).to.equal store.sensorId
 
         it 'should have updated the Driver\'s data too', ->
@@ -113,7 +121,7 @@ describe 'Sensors Controller', ->
         
     describe 'When we update a Sensor (PUT /sensors/:id) with data considered invalid by its Driver', ->
 
-        update = fixtures.invalidUpdateForTestSensor
+        update = fixturesSensor.invalidUpdateForTestSensor
 
         it 'should allow requests', (done) ->
             @client.put "sensors/#{store.sensorId}", update, done
@@ -129,9 +137,9 @@ describe 'Sensors Controller', ->
         it 'should return the unmodified sensor', ->
             expect(@err).to.not.exist
             expect(@response.statusCode).to.equal 200
-            expect(@body.customId).to.equal fixtures.validUpdateForTestSensor.customId
-            expect(@body.name).to.equal fixtures.validUpdateForTestSensor.sensorName
-            expect(@body.type).to.equal fixtures.validUpdateForTestSensor.type
+            expect(@body.customId).to.equal fixturesSensor.validUpdateForTestSensor.customId
+            expect(@body.name).to.equal fixturesSensor.validUpdateForTestSensor.sensorName
+            expect(@body.driverId).to.equal @driver.id
             expect(@body.id).to.equal store.sensorId
 
         it 'should not have updated the Driver\'s data too', ->
@@ -160,7 +168,11 @@ describe 'Sensors Controller', ->
 
     describe 'When we delete a Sensor (DELETE /sensors/:id) and its Driver doesn\'t allow it', ->
         
-        before(helpers.createSensor(fixtures.supportedSensor1))
+        before (done) ->
+        	sensor = fixturesSensor.supportedSensor1
+        	sensor.driverId = @driver.id
+        	helpers.createSensor(sensor)
+	        done null
 
         # @todo Modify "remove" function of driver so that it returns an error: before helpers.updateDriver ...
 
@@ -177,9 +189,9 @@ describe 'Sensors Controller', ->
             
         it 'should return it', ->
             expect(@err).to.not.exist
-            expect(@body.customId).to.equal fixtures.supportedSensor1.customId
-            expect(@body.name).to.equal fixtures.supportedSensor1.sensorName
-            expect(@body.type).to.equal fixtures.supportedSensor1.type
+            expect(@body.customId).to.equal fixturesSensor.supportedSensor1.customId
+            expect(@body.name).to.equal fixturesSensor.supportedSensor1.sensorName
+            expect(@body.driverId).to.equal @driver.id
             expect(@body.id).to.equal @sensor.id
             
         it 'should not have deleted the sensor from the Driver\'s data too', ->
