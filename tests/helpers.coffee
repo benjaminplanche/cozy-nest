@@ -7,6 +7,8 @@
 ###
 
 path = require 'path'
+os = require 'os'
+fs = require 'fs'
 fixtures = require 'cozy-fixtures'
 if process.env.USE_JS
     prefix = path.join __dirname, '../build/'
@@ -17,6 +19,7 @@ Client = require('request-json').JsonClient
 ds = require 'cozydb/lib/utils/client'
 
 Sensor = require "#{prefix}server/models/sensor"
+Driver = require "#{prefix}server/models/driver"
 
 TESTPORT = process.env.PORT or 8013
 
@@ -47,6 +50,22 @@ module.exports =
             baseSensor = new Sensor(data)
             Sensor.create baseSensor, (err, sensor) =>
                 @sensor = sensor
+                done err
+
+    createDriver: (filename) ->
+        (done) ->
+            # Copy file so the original doesn't get deleted during the creation:
+            fs.createReadStream(filename).pipe(fs.createWriteStream(os.tmpdir() + filename))
+            data =
+                file: 
+                    originalFilename: os.tmpdir() + filename
+                    path: os.tmpdir() + filename
+
+            console.log("CREATING DRIVER")
+            baseDriver = new Driver(data)
+            Driver.create baseDriver, (err, driver) =>
+                console.log("CREATED DRIVER")
+                @driver = driver
                 done err
 
     makeTestClient: (done) ->
