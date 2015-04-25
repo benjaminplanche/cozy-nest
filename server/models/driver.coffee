@@ -114,10 +114,17 @@ module.exports = class Driver extends cozydb.CozyModel
 
 		file = 
 			path : data.path
-			
-		unless file.ext = path.extname(file.path) and file.ext in ['.zip', '.tar', '.tar.bz2', '.tar.gz', '.js', '.coffee']
+
+		cleanUp = ->
+			fs.unlink file.path, (err) ->
+				console.log 'Could not delete %s', file.path if err
+				cb null # loop anyway
+
+		file.ext = path.extname(file.path)
+		unless file.ext in ['.zip', '.tar', '.tar.bz2', '.tar.gz', '.js', '.coffee']
 			callback 'Unknown file extension', null
 			return cleanUp()
+
 		unless file.name = path.basename(file.path, file.ext)
 			callback 'Unknown file name', null
 			return cleanUp()
