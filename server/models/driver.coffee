@@ -17,7 +17,7 @@ cozydb = require 'cozydb'
 Sensor = require './sensor'
 Actuator = require './actuator'
 
-DRIVERS_DIR = '../drivers/'
+DRIVERS_DIR = __dirname + '/../drivers/'
 
 actuatorsDrivers = null
 sensorsDrivers = null # List of drivers supported by the system - Must be set when server starts.
@@ -171,7 +171,7 @@ module.exports = class Driver extends cozydb.CozyModel
 					unless isActuator = driverModule.isActuator or isSensor = driverModule.isSensor # or (!isActuator and !isSensor)
 						callback 'Driver not defining if for Sensors and/or Actuators', null
 						
-					unless driverModule.add and driverModule.remove and driver.update and driver.apply and (!isActuator or driver.init)
+					unless driverModule.add and driverModule.remove and driver.update and driver.init and (!isActuator or driver.apply)
 						callback 'Driver not implementing the interface', null
 						
 					driverModule.init (err) ->
