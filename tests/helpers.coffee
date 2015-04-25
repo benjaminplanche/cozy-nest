@@ -27,7 +27,7 @@ module.exports =
     prefix: prefix
 
     startServer: (done) ->
-        @timeout 10000
+        @timeout 100000
         option =
             host: 'localhost'
             port: TESTPORT
@@ -55,14 +55,13 @@ module.exports =
     createDriver: (filename) ->
         (done) ->
             # Copy file so the original doesn't get deleted during the creation:
-            fs.createReadStream(filename).pipe(fs.createWriteStream(os.tmpdir() + filename))
-            data =
-                file: 
-                    originalFilename: os.tmpdir() + filename
-                    path: os.tmpdir() + filename
-
-            console.log("CREATING DRIVER")
-            baseDriver = new Driver(data)
+            extName = path.basename(filename) 
+            fs.createReadStream(filename).pipe(fs.createWriteStream(os.tmpdir() + "/" + extName))
+            
+            fileData =
+                path: os.tmpdir() + "/" + extName
+            console.log("DRIVER PATH:" + fileData.path)
+            baseDriver = new Driver(fileData)
             Driver.create baseDriver, (err, driver) =>
                 console.log("CREATED DRIVER")
                 @driver = driver
