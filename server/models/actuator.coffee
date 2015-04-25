@@ -33,7 +33,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 	# @param callback (Function(Error):null):		Callback
 	###
 	destroy: (callback) ->
-		superDestroy = super
+		superDestroy = (callback) -> super callback
 		actuatorsDrivers[@driverId].remove @customId, (err2) ->
 			if err2
 				callback err2
@@ -58,7 +58,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 	# @param callback (Function(Error, Actuator):null):	Callback
 	###
 	updateAttributes: (data, callback) ->
-		superUpdateAttributes = super
+		superUpdateAttributes = (data, callback) -> super data, callback
 		prevData =
 			customId: @customId
 			name: @name
@@ -100,7 +100,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 	###
 	@create: (data, callback) ->
 		thisActuator = @
-		superCreate = super
+		superCreate = (data, callback) -> super data, callback
 		if actuatorsDrivers[data.driverId] # If this kind of device is supported:
 			# Check if this actuator isn't already added (the combination driverId + customId should be unique):
 			params = key: [data.accountID, data.driverId]

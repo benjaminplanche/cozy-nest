@@ -110,7 +110,7 @@ module.exports = class Driver extends cozydb.CozyModel
 	# @param callback (Function(Error, Driver):null): 	Callback
 	###
 	@create: (data, callback) ->
-		superCreate = super
+		superCreate = (data, callback) -> super data, callback
 
 		file = 
 			path : data.path

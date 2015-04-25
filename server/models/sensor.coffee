@@ -24,7 +24,7 @@ module.exports = class Sensor extends cozydb.CozyModel
 	# @param callback (Function(Error):null):		Callback
 	###
 	destroy: (callback) ->
-		superDestroy = super
+		superDestroy = (callback) -> super callback
 		sensorsDrivers[@driverId].remove @customId, (err2) ->
 			if err2
 				callback err2
@@ -53,7 +53,7 @@ module.exports = class Sensor extends cozydb.CozyModel
 			customId: @customId
 			name: @name
 			driverId: @driverId
-		superUpdateAttributes = super
+		superUpdateAttributes = (data, callback) -> super data, callback
 		# Update DB:
 		superUpdateAttributes data, (err, sensor) ->
 			if err
@@ -104,7 +104,7 @@ module.exports = class Sensor extends cozydb.CozyModel
 	###
 	@create: (data, callback) ->
 		thisSensor = @
-		superCreate = super
+		superCreate = (data, callback) -> super data, callback
 		if sensorsDrivers[data.driverId] # If this kind of device is supported:
 			# Check if this sensor isn't already added (the combination driverId + customId should be unique):
 			params = key: [data.accountID, data.driverId]
