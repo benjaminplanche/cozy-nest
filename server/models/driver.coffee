@@ -130,7 +130,7 @@ module.exports = class Driver extends cozydb.CozyModel
 			return cleanUp()
 		
 		# Check if this driver isn't already added (the name should be unique):
-		@byName file.name (err, drivers)->
+		@byName file.name, (err, drivers)->
 			if err
 				callback 'DB error', null
 			else if drivers.length isnt 0 # Driver already exists.
