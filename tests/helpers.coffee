@@ -60,9 +60,9 @@ module.exports =
             
             fileData =
                 path: os.tmpdir() + "/" + extName
-            console.log("DRIVER PATH:" + fileData.path)
-            baseDriver = new Driver(fileData)
-            Driver.create baseDriver, (err, driver) =>
+
+            # baseDriver = new Driver(fileData)
+            Driver.create fileData, (err, driver) =>
                 console.log("CREATED DRIVER")
                 @driver = driver
                 done err
