@@ -8,7 +8,7 @@
 module.exports = 
 	basicSensorDriver:
 		name: "BasicDriver"
-		file: "./basicDriver.coffee"
+		file: __dirname + "/basicDriver.coffee"
 		
 	unexistingSensorDriver:
 		name: "Unexisting Driver"
