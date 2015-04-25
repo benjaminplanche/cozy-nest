@@ -111,12 +111,14 @@ module.exports = class Driver extends cozydb.CozyModel
 	###
 	@create: (data, callback) ->
 		superCreate = super
-		
-		file = data.file
-		unless file.ext = path.extname(file.originalFilename) and file.ext in ['.zip', '.tar', '.tar.bz2', '.tar.gz', '.js', '.coffee']
+
+		file = 
+			path : data.path
+			
+		unless file.ext = path.extname(file.path) and file.ext in ['.zip', '.tar', '.tar.bz2', '.tar.gz', '.js', '.coffee']
 			callback 'Unknown file extension', null
 			return cleanUp()
-		unless file.name = path.basename(file.originalFilename, file.ext)
+		unless file.name = path.basename(file.path, file.ext)
 			callback 'Unknown file name', null
 			return cleanUp()
 		
