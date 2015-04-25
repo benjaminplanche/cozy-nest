@@ -9,6 +9,7 @@
 path = require 'path'
 os = require 'os'
 fs = require 'fs'
+mkdirp = require 'mkdirp'
 fixtures = require 'cozy-fixtures'
 if process.env.USE_JS
     prefix = path.join __dirname, '../build/'
@@ -22,6 +23,8 @@ Sensor = require "#{prefix}server/models/sensor"
 Driver = require "#{prefix}server/models/driver"
 
 TESTPORT = process.env.PORT or 8013
+DRIVERS_DIR = __dirname + '/../server/drivers'
+
 
 module.exports =
     prefix: prefix
@@ -39,6 +42,18 @@ module.exports =
     killServer: ->
         @server.close()
 
+    clearFiles: (done) ->
+        fs.readdir DRIVERS_DIR, (err, files) ->
+            return console.log 'Could not delete files' if err
+
+            async.each files, (file, cb) ->
+                fs.unlink file.path, (err) ->
+                    console.log 'Could not delete %s', file.path if err
+                    cb null # loop anyway
+            , ->
+                fs.rmdir DRIVERS_DIR, (err) ->
+                    done err
+
     clearDB: (done) ->
          fixtures.resetDatabase callback: done
 	
@@ -54,18 +69,22 @@ module.exports =
 
     createDriver: (filename) ->
         (done) ->
-            # Copy file so the original doesn't get deleted during the creation:
-            extName = path.basename(filename) 
-            fs.createReadStream(filename).pipe(fs.createWriteStream(os.tmpdir() + "/" + extName))
-            
-            fileData =
-                path: os.tmpdir() + "/" + extName
 
-            # baseDriver = new Driver(fileData)
-            Driver.create fileData, (err, driver) =>
-                console.log("CREATED DRIVER")
-                @driver = driver
-                done err
+            mkdirp DRIVERS_DIR, (err) ->
+                return done err if err
+
+                # Copy file so the original doesn't get deleted during the creation:
+                extName = path.basename(filename) 
+                fs.createReadStream(filename).pipe(fs.createWriteStream(os.tmpdir() + "/" + extName))
+                
+                fileData =
+                    path: os.tmpdir() + "/" + extName
+
+                # baseDriver = new Driver(fileData)
+                Driver.create fileData, (err, driver) =>
+                    console.log("CREATED DRIVER")
+                    @driver = driver
+                    done err
 
     makeTestClient: (done) ->
         old = new Client "http://localhost:#{TESTPORT}/"
