@@ -16,13 +16,13 @@ config =
 
             app.server = server
             
-            # @todo Load Drivers
-            # actuatorsDrivers = ...
-            # sensorsDrivers = ...
+            # Load Drivers & Pass their reference to models:
+            actuatorsDrivers = {}
+            sensorsDrivers = {}
 
-            # @todo Pass their reference to controllers:
-            # require('./controllers/actuator').setDrivers actuatorsDrivers
-            # require('./controllers/sensor').setDrivers sensorsDrivers
+            require('./models/actuator').setDrivers actuatorsDrivers
+            require('./models/sensor').setDrivers sensorsDrivers
+            require('./models/driver').setDrivers sensorsDrivers, actuatorsDrivers
 
             # Initialize Realtime
             realtime = RealtimeAdapter server, ['nest.*']
