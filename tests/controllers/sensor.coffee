@@ -116,6 +116,7 @@ describe 'Sensors Controller', ->
             expect(@body.name).to.equal fixturesSensor.validUpdateForTestSensor.name
             expect(@body.driverId).to.equal store.driver.id
             expect(@body.id).to.equal store.sensorId
+            store.sensorName = @body.name
 
         it 'should have updated the Driver\'s data too', ->
             # @todo Implement test
