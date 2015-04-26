@@ -20,7 +20,9 @@ describe 'Sensors Controller', ->
     before helpers.startServer
     before helpers.makeTestClient
     before helpers.createDriver fixturesDriver.basicSensorDriver.file
-    before (done) -> store["driver"] = helpers.getInStore('driver')
+    before (done) ->
+        store["driver"] = helpers.getInStore('driver')
+        done null
 
     after  helpers.killServer
 
