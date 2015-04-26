@@ -102,7 +102,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 		superCreate = (data, callback) => super data, callback
 		if actuatorsDrivers[data.driverId] # If this kind of device is supported:
 			# Check if this actuator isn't already added (the combination driverId + customId should be unique):
-			params = key: [data.customID, data.driverId]
+			params = key: [data.customId, data.driverId]
 			@request "byCustomIdAndDriver", params, (err, actuators)->
 				if err
 					callback err, null
