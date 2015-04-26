@@ -54,11 +54,11 @@ module.exports = class Sensor extends cozydb.CozyModel
 			driverId: @driverId
 		superUpdateAttributes = (data, callback) => super data, callback
 		# Update DB:
-		superUpdateAttributes data, (err, sensor) ->
-			if err
-				callback err, sensor
-			# Update Driver:	
-			else
+		superUpdateAttributes data, (err, sensor) =>
+			return callback err, sensor if err
+
+			if @customId isnt prevData.customId
+				# Update Driver:
 				sensorsDrivers[@driverId].update prevData.customId, data.customId, (err2) ->
 					if err2
 						# Cancelling Modif:
@@ -69,6 +69,8 @@ module.exports = class Sensor extends cozydb.CozyModel
 							callback err2, sensor2
 					else
 						callback null, sensor
+			else
+				callback null, sensor
 	
 	
 	###
