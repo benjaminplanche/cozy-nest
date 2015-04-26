@@ -26,7 +26,7 @@ module.exports = class SensorRule extends cozydb.CozyModel
 	###
 	destroy: (callback) ->
 		sensorRule = @
-		superDestroy = (callback) -> super callback
+		superDestroy = (callback) => super callback
 		Rule.find @ruleId, (err, rule) ->
 			if err
 				callback 'Rule associated to this SensorRule couldn\'t be found: '+err
@@ -56,7 +56,7 @@ module.exports = class SensorRule extends cozydb.CozyModel
 	# @param callback (Function(Error, SensorRule):null): 	Callback
 	###
 	@create: (data, callback) ->
-		superCreate = (data, callback) -> super data, callback
+		superCreate = (data, callback) => super data, callback
 		Sensor.find data.sensorId, (err, sensor) ->
 			if err
 				callback 'Sensor associated to this rule couldn\'t be found: '+err, null

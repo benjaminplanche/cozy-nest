@@ -48,7 +48,7 @@ module.exports = class ActuatorRule extends cozydb.CozyModel
 	# @param callback (Function(Error, ActuatorRule):null): Callback
 	###
 	@create: (data, callback) ->
-		superCreate = (data, callback) -> super data, callback
+		superCreate = (data, callback) => super data, callback
 		Actuator.find data.actuatorId, (err, actuator) ->
 			if err
 				callback 'Actuator associated to this rule couldn\'t be found: '+err, null

@@ -104,30 +104,37 @@ module.exports = class Rule extends cozydb.CozyModel
 	# @param callback (Function(Error):null):		Callback
 	###
 	destroy: (callback) ->
+		superDestroy = (callback) => super callback
+
 		params = key: @id
-		SensorRule.request "byRule", params, (err, sensorRules)->
-			if err
-				callback 'Error while deleting the conditions (SensorRules) associated: '+err
-			msgErr = ''
-			partialCallback = partialErr ->
-				msgErr += 'Error while deleting SensorRule: ' + partialErr + '\n'
-			
-			sensorRule.destroy partialCallback for sensorRule in sensorRules
-			if msgErr?
-				callback msgErr
-		
-		ActuatorRule.request "byRule", params, (err, actuatorRules)->
-			if err
-				callback 'Error while deleting the conditions (ActuatorRules) associated: '+err
-			msgErr = ''
-			partialCallback = partialErr ->
-				msgErr += 'Error while deleting ActuatorRule: ' + partialErr + '\n'
-			
-			actuatorRule.destroy partialCallback for actuatorRule in actuatorRules
-			if msgErr?
-				callback msgErr
-		
-		super callback
+		async.parallel [
+			(cb) ->
+				SensorRule.request "byRule", params, (err, sensorRules)->
+					if err
+						cb 'Error while deleting the conditions (SensorRules) associated: '+err
+					msgErr = ''
+					partialCallback = partialErr ->
+						msgErr += 'Error while deleting SensorRule: ' + partialErr + '\n'
+					
+					sensorRule.destroy partialCallback for sensorRule in sensorRules
+					if msgErr?
+						cb msgErr
+			,
+			(cb) ->
+				ActuatorRule.request "byRule", params, (err, actuatorRules)->
+					if err
+						cb 'Error while deleting the conditions (ActuatorRules) associated: '+err
+					msgErr = ''
+					partialCallback = partialErr ->
+						msgErr += 'Error while deleting ActuatorRule: ' + partialErr + '\n'
+					
+					actuatorRule.destroy partialCallback for actuatorRule in actuatorRules
+					if msgErr?
+						cb msgErr
+		 ], (err, results) ->
+		 	return callback err if err
+		 	
+			superDestroy callback
 
 	###
 	# checkMetRules

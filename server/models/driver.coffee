@@ -36,7 +36,7 @@ module.exports = class Driver extends cozydb.CozyModel
 	# @param callback (Function(Error):null):		Callback
 	###
 	destroy: (callback) ->
-		superDestroy = super
+		superDestroy = (callback) => super callback
 		thisDriver = @
 		
 		# Find if there are still devices depending on this driver:

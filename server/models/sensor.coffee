@@ -23,7 +23,7 @@ module.exports = class Sensor extends cozydb.CozyModel
 	# @param callback (Function(Error):null):		Callback
 	###
 	destroy: (callback) ->
-		superDestroy = (callback) -> super callback
+		superDestroy = (callback) => super callback
 		sensorsDrivers[@driverId].remove @customId, (err2) ->
 			if err2
 				callback err2
@@ -52,7 +52,7 @@ module.exports = class Sensor extends cozydb.CozyModel
 			customId: @customId
 			name: @name
 			driverId: @driverId
-		superUpdateAttributes = (data, callback) -> super data, callback
+		superUpdateAttributes = (data, callback) => super data, callback
 		# Update DB:
 		superUpdateAttributes data, (err, sensor) ->
 			if err
