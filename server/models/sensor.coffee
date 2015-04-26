@@ -107,7 +107,7 @@ module.exports = class Sensor extends cozydb.CozyModel
 
 		if sensorsDrivers[data.driverId] # If this kind of device is supported:
 			# Check if this sensor isn't already added (the combination driverId + customId should be unique):
-			params = key: [data.accountID, data.driverId]
+			params = key: [data.customID, data.driverId]
 			@request "byCustomIdAndDriver", params, (err, sensors)->
 				if err
 					callback err, null
