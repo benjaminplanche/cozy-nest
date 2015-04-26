@@ -7,21 +7,23 @@
 
 sensors = []
 
-module.export.init = (callback) ->
+module.exports.isSensor = true
+
+module.exports.init = (callback) ->
 	return callback null
 
-modul.export.add = (customId, id, callback) ->
+module.exports.add = (customId, id, callback) ->
 	if sensors[customId]
 		callback 'Custom ID already used.'
 	else
 		sensors[customId] = id
 		callback null
 
-module.export.remove = (customId, id, callback) ->
+module.exports.remove = (customId, id, callback) ->
 	delete sensors[customId]
 	return callback null
 
-module.export.update = (oldCustomId, newCustomId, callback) ->
+module.exports.update = (oldCustomId, newCustomId, callback) ->
 	if sensors[newCustomId]
 		callback 'Custom ID already used.'
 	else
