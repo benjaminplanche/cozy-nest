@@ -103,7 +103,8 @@ module.exports = class Sensor extends cozydb.CozyModel
 	###
 	@create: (data, callback) ->
 		thisSensor = @
-		superCreate = (data, callback) -> super data, callback
+		superCreate = (data, callback) => super data, callback
+
 		if sensorsDrivers[data.driverId] # If this kind of device is supported:
 			# Check if this sensor isn't already added (the combination driverId + customId should be unique):
 			params = key: [data.accountID, data.driverId]
@@ -114,12 +115,10 @@ module.exports = class Sensor extends cozydb.CozyModel
 					callback 'Device already added', sensors[0]
 				else
 					superCreate data, (err, sensor) ->
-						if err
-							callback err, null
-							return
-							
+						return callback err, null if err
+						
 						# Let the driver handle the integration of the device to the system:
-						sensorsDrivers[driverId].add customId, sensor.id, (err) ->
+						sensorsDrivers[data.driverId].add data.customId, sensor.id, (err) ->
 							if err
 								# Cancelling modif:
 								thisSensor.requestDestroy "all", {key: sensor.id}, (err) ->
