@@ -166,8 +166,11 @@ module.exports = class Driver extends cozydb.CozyModel
 
 				# Initialize the driver:
 				initializeDriver = () ->
-					unless driverModule = require dirName + file.name
+					try
+						driverModule = require(dirName + file.name)
+					catch
 						callback 'Couldn\'t find module', null
+					
 					unless isActuator = driverModule.isActuator or isSensor = driverModule.isSensor # or (!isActuator and !isSensor)
 						callback 'Driver not defining if for Sensors and/or Actuators', null
 						
