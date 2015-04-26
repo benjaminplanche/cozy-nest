@@ -58,7 +58,7 @@ module.exports.create = (req, res) ->
 				return cleanUp()
 				
 			data = path : file
-			Driver.prepareAndCreate data, (err, driver) ->
+			Driver.create data, (err, driver) ->
 				if err?
 					if err == 'Driver already added'
 						res.send driver, 202
