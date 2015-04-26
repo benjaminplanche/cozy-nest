@@ -26,6 +26,8 @@ TESTPORT = process.env.PORT or 8013
 DRIVERS_DIR = __dirname + '/../server/drivers'
 
 
+store = {}
+
 module.exports =
     prefix: prefix
 
@@ -35,7 +37,7 @@ module.exports =
             host: 'localhost'
             port: TESTPORT
         start = require("#{prefix}server").start
-        start option, (app, server) =>
+        start option, (app, server) ->
             @server = server
             done null
 
@@ -63,7 +65,7 @@ module.exports =
     createSensor: (data) ->
         (done) ->
             baseSensor = new Sensor(data)
-            Sensor.create baseSensor, (err, sensor) =>
+            Sensor.create baseSensor, (err, sensor) ->
                 @sensor = sensor
                 done err
 
@@ -81,10 +83,14 @@ module.exports =
                     path: os.tmpdir() + "/" + extName
 
                 # baseDriver = new Driver(fileData)
-                Driver.prepareAndCreate fileData, (err, driver) =>
-                    console.log("CREATED DRIVER")
+                Driver.prepareAndCreate fileData, (err, driver) ->
+                    console.log("CREATED DRIVER:" + driver)
                     @driver = driver
+                    store['driver'] = driver
                     done err
+
+    getInStore: (el) ->
+        return store[el]
 
     makeTestClient: (done) ->
         old = new Client "http://localhost:#{TESTPORT}/"
@@ -92,7 +98,7 @@ module.exports =
 
         store = this # this will be the common scope of tests
 
-        callbackFactory = (done) -> (error, response, body) =>
+        callbackFactory = (done) -> (error, response, body) ->
             return done error if error
             store.response = response
             store.body = body

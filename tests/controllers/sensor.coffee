@@ -20,15 +20,17 @@ describe 'Sensors Controller', ->
     before helpers.startServer
     before helpers.makeTestClient
     before helpers.createDriver fixturesDriver.basicSensorDriver.file
+    before (done) -> store["driver"] = helpers.getInStore('driver')
 
     after  helpers.killServer
 
     describe 'When we create a Sensor (POST /sensors) which is supported by a Driver', ->
 
+        sensor = fixturesSensor.supportedSensor1
+
         before (done) ->
-	        sensor = fixturesSensor.supportedSensor1
-	        sensor.driverId = @driver.id
-	        done null
+            sensor.driverId = store.driver.id
+            done null
 
         it 'should allow requests', (done) ->
             @client.post 'sensors', sensor, done
@@ -45,9 +47,10 @@ describe 'Sensors Controller', ->
 
     describe 'When we try creating a 2nd Sensor (POST /sensors) with the same driver and customId', ->
 
+        sensor = fixturesSensor.supportedSensor1
+
         before (done) ->
-	        sensor = fixturesSensor.supportedSensor1
-	        sensor.driverId = @driver.id
+	        sensor.driverId = store.driver.id
 	        sensor.name = 'Different Name' # name is not taken into account to evaluate similarity.
 	        done null
 
@@ -85,7 +88,7 @@ describe 'Sensors Controller', ->
             expect(@err).to.not.exist
             expect(@body.customId).to.equal fixturesSensor.supportedSensor1.customId
             expect(@body.name).to.equal fixturesSensor.supportedSensor1.sensorName
-            expect(@body.driverId).to.equal @driver.id
+            expect(@body.driverId).to.equal store.driver.id
             expect(@body.id).to.equal store.sensorId
 
             
@@ -113,7 +116,7 @@ describe 'Sensors Controller', ->
             expect(@response.statusCode).to.equal 200
             expect(@body.customId).to.equal fixturesSensor.validUpdateForTestSensor.customId
             expect(@body.name).to.equal fixturesSensor.validUpdateForTestSensor.sensorName
-            expect(@body.driverId).to.equal @driver.id
+            expect(@body.driverId).to.equal store.driver.id
             expect(@body.id).to.equal store.sensorId
 
         it 'should have updated the Driver\'s data too', ->
@@ -139,7 +142,7 @@ describe 'Sensors Controller', ->
             expect(@response.statusCode).to.equal 200
             expect(@body.customId).to.equal fixturesSensor.validUpdateForTestSensor.customId
             expect(@body.name).to.equal fixturesSensor.validUpdateForTestSensor.sensorName
-            expect(@body.driverId).to.equal @driver.id
+            expect(@body.driverId).to.equal store.driver.id
             expect(@body.id).to.equal store.sensorId
 
         it 'should not have updated the Driver\'s data too', ->
@@ -167,10 +170,11 @@ describe 'Sensors Controller', ->
             # @todo Implement test
 
     describe 'When we delete a Sensor (DELETE /sensors/:id) and its Driver doesn\'t allow it', ->
-        
+       
+        sensor = fixturesSensor.supportedSensor1
+
         before (done) ->
-        	sensor = fixturesSensor.supportedSensor1
-        	sensor.driverId = @driver.id
+        	sensor.driverId = store.driver.id
         	helpers.createSensor(sensor)
 	        done null
 
@@ -191,7 +195,7 @@ describe 'Sensors Controller', ->
             expect(@err).to.not.exist
             expect(@body.customId).to.equal fixturesSensor.supportedSensor1.customId
             expect(@body.name).to.equal fixturesSensor.supportedSensor1.sensorName
-            expect(@body.driverId).to.equal @driver.id
+            expect(@body.driverId).to.equal store.driver.id
             expect(@body.id).to.equal @sensor.id
             
         it 'should not have deleted the sensor from the Driver\'s data too', ->
