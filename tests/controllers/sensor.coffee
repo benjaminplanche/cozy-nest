@@ -11,7 +11,6 @@ fs = require 'fs'
 helpers = require '../helpers'
 expect = require('chai').expect
 
-
 store = {}
 
 describe 'Sensors Controller', ->
@@ -75,9 +74,11 @@ describe 'Sensors Controller', ->
             @client.post 'sensors', sensor, done
 
         it 'should reply with an error', ->
-            expect(@body).to.not.exist
+            # expect(@body).to.not.exist
             expect(@response.statusCode).to.equal 500
-            expect(@err).to.equal 'Server error while creating sensor.'
+            expect(@body).to.exist
+            expect(@body.error).to.exist
+            expect(@body.error).to.equal 'Device not supported'
             
     describe 'When we get a Sensor (GET /sensors/:id) which exists', ->
 
