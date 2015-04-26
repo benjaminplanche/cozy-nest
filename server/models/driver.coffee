@@ -67,7 +67,12 @@ module.exports = class Driver extends cozydb.CozyModel
 				async.parallel [
 					(cb) -> superDestroy ((err) -> cb 'Error removing driver from DB', null)
 					,
-					(cb) -> rimraf (DRIVERS_DIR + thisDriver.name), ((err) -> cb 'Error removing driver\'s files', null)
+					(cb) ->
+						modulePath = DRIVERS_DIR + thisDriver.name
+						# Removing module from cache:
+						delete require.cache[require.resolve(modulePath)]
+						# Deleting module directory:
+						rimraf (modulePath), ((err) -> cb 'Error removing driver\'s files', null)
 					,
 					(cb) -> 
 						err = null
@@ -205,8 +210,9 @@ module.exports = class Driver extends cozydb.CozyModel
 			# Clearing the previous drivers arrays (without changing the ref!)
 			for k,v in sensorsDrivers
 				delete sensorsDrivers[k] if sensorsDrivers.hasOwnProperty(k)
+
 			for k,v in actuatorsDrivers
-				delete actuatorsDrivers[k] if actuatorsDrivers.hasOwnProperty(k)
+				delete actuat
 			
 			# Refilling them:
 			for driver in drivers
