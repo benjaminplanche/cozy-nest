@@ -77,48 +77,43 @@ describe 'Sensors Controller', ->
             # expect(@body).to.not.exist
             expect(@response.statusCode).to.equal 500
             expect(@body).to.exist
-            expect(@body.error).to.exist
             expect(@body.error).to.equal 'Device not supported'
             
     describe 'When we get a Sensor (GET /sensors/:id) which exists', ->
 
-        id = store.sensorId
-
         it 'should allow requests', (done) ->
-            @client.get "sensors/#{id}", done
+            @client.get "sensors/#{store.sensorId}", done
 
         it 'should reply with the corresponding sensor', ->
             expect(@err).to.not.exist
             expect(@body.customId).to.equal fixturesSensor.supportedSensor1.customId
-            expect(@body.name).to.equal fixturesSensor.supportedSensor1.sensorName
+            expect(@body.name).to.equal store.sensorName
             expect(@body.driverId).to.equal store.driver.id
             expect(@body.id).to.equal store.sensorId
 
             
     describe 'When we get a Sensor (GET /sensors/:id) which doesn\'t exist', ->
 
-        id = store.sensorId + 404 # since "store.sensorId" is the only correct ID in DB, "store.sensorId + 404" is not.
-
+        
         it 'should allow requests', (done) ->
+            id = store.sensorId + 404 # since "store.sensorId" is the only correct ID in DB, "store.sensorId + 404" is not.
             @client.get "sensors/#{id}", done
 
         it 'should return an error', ->
-            expect(@body).to.not.exist
             expect(@response.statusCode).to.equal 404
-            expect(@err).to.equal 'Sensor not found'
+            expect(@body).to.exist
+            expect(@body.error).to.equal 'Sensor not found'
 
     describe 'When we update a Sensor (PUT /sensors/:id) with data considered valid by its Driver', ->
 
-        update = fixturesSensor.validUpdateForTestSensor
-
         it 'should allow requests', (done) ->
-            @client.put "sensors/#{store.sensorId}", update, done
+            @client.put "sensors/#{store.sensorId}", fixturesSensor.validUpdateForTestSensor, done
 
         it 'should reply with the updated sensor', ->
             expect(@err).to.not.exist
             expect(@response.statusCode).to.equal 200
             expect(@body.customId).to.equal fixturesSensor.validUpdateForTestSensor.customId
-            expect(@body.name).to.equal fixturesSensor.validUpdateForTestSensor.sensorName
+            expect(@body.name).to.equal fixturesSensor.validUpdateForTestSensor.name
             expect(@body.driverId).to.equal store.driver.id
             expect(@body.id).to.equal store.sensorId
 
@@ -144,7 +139,7 @@ describe 'Sensors Controller', ->
             expect(@err).to.not.exist
             expect(@response.statusCode).to.equal 200
             expect(@body.customId).to.equal fixturesSensor.validUpdateForTestSensor.customId
-            expect(@body.name).to.equal fixturesSensor.validUpdateForTestSensor.sensorName
+            expect(@body.name).to.equal fixturesSensor.validUpdateForTestSensor.name
             expect(@body.driverId).to.equal store.driver.id
             expect(@body.id).to.equal store.sensorId
 
@@ -197,7 +192,7 @@ describe 'Sensors Controller', ->
         it 'should return it', ->
             expect(@err).to.not.exist
             expect(@body.customId).to.equal fixturesSensor.supportedSensor1.customId
-            expect(@body.name).to.equal fixturesSensor.supportedSensor1.sensorName
+            expect(@body.name).to.equal fixturesSensor.supportedSensor1.name
             expect(@body.driverId).to.equal store.driver.id
             expect(@body.id).to.equal @sensor.id
             
