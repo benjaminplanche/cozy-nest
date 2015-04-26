@@ -21,9 +21,6 @@ DRIVERS_DIR = __dirname + '/../drivers/'
 
 actuatorsDrivers = null
 sensorsDrivers = null # List of drivers supported by the system - Must be set when server starts.
-module.exports.setDrivers = (refS, refA) -> 
-	sensorsDrivers = refS
-	actuatorsDrivers = refA
 
 module.exports = class Driver extends cozydb.CozyModel
 	@schema:
@@ -213,7 +210,7 @@ module.exports = class Driver extends cozydb.CozyModel
 
 			for k,v in actuatorsDrivers
 				delete actuat
-			
+
 			# Refilling them:
 			for driver in drivers
 				driverModule = require (DRIVERS_DIR + file.name + "/" + file.name) 
@@ -240,4 +237,14 @@ module.exports = class Driver extends cozydb.CozyModel
 							sensorsDrivers[actuator.driverId].add actuator.customId, actuator.id, cb2
 						, cb
 			], (err, results) -> callback err
-						
+	
+	###
+	# setDrivers
+	# ====
+	# Sets the lists of Sensors Drivers and Actuators Drivers.
+	# @param refS (Object): 	Reference to the list of Sensors Drivers.
+	# @param refA (Object): 	Reference to the list of Actuators Drivers.
+	###
+	@setDrivers: (refS, refA) ->
+		sensorsDrivers = refS
+		actuatorsDrivers = refA

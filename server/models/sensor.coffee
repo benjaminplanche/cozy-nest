@@ -9,7 +9,6 @@ cozydb = require 'cozydb'
 Measure = require './measure'
 
 sensorsDrivers = null # List of drivers supported by the system - Must be set when server starts.
-module.exports.setDrivers = (ref) -> sensorsDrivers = ref
 
 module.exports = class Sensor extends cozydb.CozyModel
 	@schema:
@@ -129,3 +128,11 @@ module.exports = class Sensor extends cozydb.CozyModel
 								callback null, sensor
 		else
 			callback 'Device not supported', null
+
+	###
+	# setDrivers
+	# ====
+	# Sets the list of Sensors Drivers.
+	# @param ref (Object): 	Reference to the list.
+	###
+	@setDrivers: (ref) -> sensorsDrivers = ref

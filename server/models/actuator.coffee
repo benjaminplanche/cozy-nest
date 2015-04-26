@@ -8,7 +8,6 @@
 cozydb = require 'cozydb'
 
 actuatorsDrivers = null # List of drivers supported by the system - Must be set when server starts.
-module.exports.setDrivers = (ref) -> actuatorsDrivers = ref
 
 module.exports = class Actuator extends cozydb.CozyModel
 	@schema:
@@ -125,3 +124,11 @@ module.exports = class Actuator extends cozydb.CozyModel
 								callback null, actuator
 		else
 			callback 'Device not supported', null
+
+	###
+	# setDrivers
+	# ====
+	# Sets the list of Sensors Drivers.
+	# @param ref (Object): 	Reference to the list.
+	###
+	@setDrivers: (ref) -> actuatorsDrivers = ref
