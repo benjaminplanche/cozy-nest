@@ -81,7 +81,7 @@ module.exports =
                     path: os.tmpdir() + "/" + extName
 
                 # baseDriver = new Driver(fileData)
-                Driver.create fileData, (err, driver) =>
+                Driver.prepareAndCreate fileData, (err, driver) =>
                     console.log("CREATED DRIVER")
                     @driver = driver
                     done err

@@ -7,10 +7,17 @@
 
 logger = require('printit')
 	prefix: 'driver'
-	
+
+fs = require 'fs'
+multiparty = require 'multiparty'
+path = require 'path'
+mkdirp = require 'mkdirp'
+decompress = require 'decompress'
+async = require 'async'
+rimraf = require 'rimraf'
 Driver = require '../models/driver'
 
-DRIVERS_DIR = '../drivers/'
+DRIVERS_DIR = __dirname + '/../drivers/'
 
 module.exports.fetch = (req, res, next, id) ->
 	Driver.find id, (err, driver) ->
@@ -50,8 +57,8 @@ module.exports.create = (req, res) ->
 				res.send error: 'No file sent', 400
 				return cleanUp()
 				
-			data = file : file
-			Driver.create data, (err, driver) ->
+			data = path : file
+			Driver.prepareAndCreate data, (err, driver) ->
 				if err?
 					if err == 'Driver already added'
 						res.send driver, 202

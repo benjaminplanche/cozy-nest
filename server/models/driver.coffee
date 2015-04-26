@@ -103,31 +103,24 @@ module.exports = class Driver extends cozydb.CozyModel
 		@request 'byName', key: name, callback
 
 	###
-	# create
+	# prepareAndCreate
 	# ====
 	# Adds a driver to the DB and system (unzipping its files and initializing its node module). If a similar driver already exists (same name), then this driver is returned.
 	# @param data (Object): 							Data defining the driver
 	# @param callback (Function(Error, Driver):null): 	Callback
 	###
-	@create: (data, callback) ->
-		superCreate = (data, callback) -> super data, callback
-
+	@prepareAndCreate: (data, callback) ->
 		file = 
 			path : data.path
-
-		cleanUp = ->
-			fs.unlink file.path, (err) ->
-				console.log 'Could not delete %s', file.path if err
-				cb null # loop anyway
+			ext : ''
+			name : ''
 
 		file.ext = path.extname(file.path)
 		unless file.ext in ['.zip', '.tar', '.tar.bz2', '.tar.gz', '.js', '.coffee']
-			callback 'Unknown file extension', null
-			return cleanUp()
+			return callback 'Unknown file extension', null
 
 		unless file.name = path.basename(file.path, file.ext)
-			callback 'Unknown file name', null
-			return cleanUp()
+			return callback 'Unknown file name', null
 		
 		# Check if this driver isn't already added (the name should be unique):
 		@byName file.name, (err, drivers)->
@@ -167,7 +160,7 @@ module.exports = class Driver extends cozydb.CozyModel
 				# Initialize the driver:
 				initializeDriver = () ->
 					try
-						driverModule = require dirName + file.name
+						driverModule = require path.resolve(dirName, file.name)
 					catch
 						callback 'Couldn\'t find module', null
 					
@@ -179,7 +172,7 @@ module.exports = class Driver extends cozydb.CozyModel
 						
 					unless driverModule.add and driverModule.remove and driverModule.update and driverModule.init and (isActuator isnt true or driverModule.apply)
 						callback 'Driver not implementing the interface', null
-						
+					
 					driverModule.init (err) ->
 						if err
 							callback 'Error initializing the driver', null
@@ -189,14 +182,16 @@ module.exports = class Driver extends cozydb.CozyModel
 								name: file.name
 								isSensor: isSensor
 								isActuator: isActuator
-							superCreate data, (err, driver) ->
+							driver = new Driver(data)
+							
+							Driver.create driver, (err, d) ->
 								if err
 									callback 'Error saving the driver in DB', null
 								else
-									sensorsDrivers[driver.id] = driverModule if driver.isSensor
-									actuatorsDrivers[driver.id] = driverModule if driver.isActuator
-									callback null, driver
-	
+									sensorsDrivers[d.id] = driverModule if d.isSensor
+									actuatorsDrivers[d.id] = driverModule if d.isActuator
+									callback null, d
+
 	###
 	# reinit
 	# ====
