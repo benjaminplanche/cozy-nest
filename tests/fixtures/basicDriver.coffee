@@ -32,12 +32,12 @@ module.exports.update = (oldCustomId, newCustomId, callback) ->
 	else
 		
 		if isCustomIDValidExample newCustomId
-			console.log("DRIVER - UPDATE IS VALID: " + newCustomId)
+			# console.log("DRIVER - UPDATE IS VALID: " + newCustomId)
 			sensors[oldCustomId] = sensors[newCustomId]
 			sensors[newCustomId] = null
 			callback null
 		else
-			console.log("DRIVER - UPDATE IS NOT VALID: " + newCustomId)
+			# console.log("DRIVER - UPDATE IS NOT VALID: " + newCustomId)
 			callback "Invalid CustomId"
 
 isCustomIDValidExample = (customId) ->
