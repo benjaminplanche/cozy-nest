@@ -129,12 +129,12 @@ describe 'Sensors Controller', ->
             @client.put "sensors/#{store.sensorId}", update, done
 
         it 'should return an error', ->
-            expect(@body).to.not.exist
             expect(@response.statusCode).to.equal 500
-            expect(@err).to.equal 'Server error while saving sensor'
+            expect(@body).to.exist
+            expect(@body.error).to.exist
 
         it 'when we get the targeted Sensor (GET /sensors/:id)', (done) ->
-            @client.get "sensors/#{id}", done
+            @client.get "sensors/#{store.sensorId}", done
             
         it 'should return the unmodified sensor', ->
             expect(@err).to.not.exist
