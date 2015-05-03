@@ -26,4 +26,4 @@ module.exports =
 		name: "Supported Sensor #1 v2"
 		
 	invalidUpdateForTestSensor:
-		customId: "IDNaN"
+		customId: "IDDefinitelyNotAValidValue"
