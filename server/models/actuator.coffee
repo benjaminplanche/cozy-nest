@@ -33,7 +33,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 	###
 	destroy: (callback) ->
 		superDestroy = (callback) => super callback
-		actuatorsDrivers[@driverId].remove @customId, (err2) ->
+		actuatorsDrivers[@driverId].remove @customId, @id, (err2) ->
 			if err2
 				callback err2
 			else
