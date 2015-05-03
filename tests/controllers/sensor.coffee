@@ -46,6 +46,9 @@ describe 'Sensors Controller', ->
             expect(@body.id).to.exist
             store.sensorId = @body.id
             store.sensorName = @body.name
+            
+        it 'should have been passed to its driver', ->
+            expect(store["driverModule"].getSensor(sensor.customId)).to.equal store.sensorId
 
     describe 'When we try creating a 2nd Sensor (POST /sensors) with the same driver and customId', ->
 
@@ -120,7 +123,8 @@ describe 'Sensors Controller', ->
             store.sensorName = @body.name
 
         it 'should have updated the Driver\'s data too', ->
-            # @todo Implement test
+            expect(store["driverModule"].getSensor(fixturesSensor.supportedSensor1.customId)).to.not.exist
+            expect(store["driverModule"].getSensor(fixturesSensor.validUpdateForTestSensor.customId)).to.equal store.sensorId
         
     describe 'When we update a Sensor (PUT /sensors/:id) with data considered invalid by its Driver', ->
 
@@ -146,7 +150,8 @@ describe 'Sensors Controller', ->
             expect(@body.id).to.equal store.sensorId
 
         it 'should not have updated the Driver\'s data too', ->
-            # @todo Implement test
+            expect(store["driverModule"].getSensor(fixturesSensor.invalidUpdateForTestSensor.customId)).to.not.exist
+            expect(store["driverModule"].getSensor(fixturesSensor.validUpdateForTestSensor.customId)).to.equal store.sensorId
 
     describe 'When we delete a Sensor (DELETE /sensors/:id) and its Driver allows it', ->
 
@@ -167,7 +172,7 @@ describe 'Sensors Controller', ->
             expect(@body.error).to.equal 'Sensor not found'
             
         it 'should have deleted the sensor from the Driver\'s data too', ->
-            # @todo Implement test
+            expect(store["driverModule"].getSensor(fixturesSensor.validUpdateForTestSensor.customId)).to.not.exist
 
     describe 'When we delete a Sensor (DELETE /sensors/:id) and its Driver doesn\'t allow it', ->
        
@@ -182,8 +187,6 @@ describe 'Sensors Controller', ->
             helpers.createSensor(sensor) () ->
                 store.sensorId = helpers.getInStore('sensor').id
                 done null
-
-        # @todo Modify "remove" function of driver so that it returns an error: before helpers.updateDriver ...
 
         it 'should allow requests', (done) ->
             @client.del "sensors/#{store.sensorId}", done
@@ -204,4 +207,4 @@ describe 'Sensors Controller', ->
             expect(@body.id).to.equal store.sensorId
             
         it 'should not have deleted the sensor from the Driver\'s data too', ->
-            # @todo Implement test
+            expect(store["driverModule"].getSensor(fixturesSensor.supportedSensor1.customId)).to.equal store.sensorId
