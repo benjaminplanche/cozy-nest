@@ -171,16 +171,16 @@ describe 'Sensors Controller', ->
     describe 'When we delete a Sensor (DELETE /sensors/:id) and its Driver doesn\'t allow it', ->
        
         sensor = fixturesSensor.supportedSensor1
-
+        
         before (done) ->
-        	sensor.driverId = store.driver.id
-        	helpers.createSensor(sensor)
-	        done null
+            sensor.driverId = store.driver.id
+            helpers.createSensor(sensor) () ->
+                store.sensorId = helpers.getInStore('sensor').id
+                done null
 
         # @todo Modify "remove" function of driver so that it returns an error: before helpers.updateDriver ...
 
         it 'should allow requests', (done) ->
-            store.sensorId = helpers.getInStore('sensor').id
             @client.del "sensors/#{store.sensorId}", done
 
         it 'should return an error', ->
