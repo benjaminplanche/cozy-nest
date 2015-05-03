@@ -5,6 +5,9 @@
 # Defines a Driver, interfacing with devices
 ###
 
+require 'coffee-script/register'
+Coffeescript = require 'coffee-script'
+
 fs = require 'fs'
 multiparty = require 'multiparty'
 path = require 'path'
@@ -12,6 +15,7 @@ mkdirp = require 'mkdirp'
 decompress = require 'decompress'
 async = require 'async'
 rimraf = require 'rimraf'
+copyFile = require('../helpers').copyFile
 cozydb = require 'cozydb'
 
 Sensor = require './sensor'
@@ -133,6 +137,7 @@ module.exports = class Driver extends cozydb.CozyModel
 			else
 				# If zipped, unzip. Otherwise copy it to its own folder:
 				dirName = DRIVERS_DIR + file.name + "/"
+				modulePath = path.resolve dirName, file.name
 
 				if file.ext in ['.zip', '.tar', '.tar.bz2', '.tar.gz']
 					# Unzip it:
@@ -156,13 +161,17 @@ module.exports = class Driver extends cozydb.CozyModel
 						if err
 							callback 'Error creating the directory for the driver', null
 						else
-							fs.createReadStream(file.path).pipe(fs.createWriteStream(dirName + file.name + file.ext))
-							initializeDriver()
+							copyFile file.path, modulePath + file.ext, initializeDriver
+							# fs.createReadStream(file.path).pipe(fs.createWriteStream(dirName + file.name + file.ext))
+							# initializeDriver()
 
 				# Initialize the driver:
+				
+				# js = Coffeescript.compile( path.resolve(dirName, file.name+".coffee"))
+				
 				initializeDriver = () ->
 					try
-						driverModule = require path.resolve(dirName, file.name)
+						driverModule = require modulePath
 					catch
 						callback 'Couldn\'t find module', null
 					
