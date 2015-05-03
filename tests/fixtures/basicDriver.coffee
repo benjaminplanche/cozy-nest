@@ -9,6 +9,9 @@ sensors = []
 
 module.exports.isSensor = true
 
+areDevicesRemovable = true 
+module.exports.setRemovableFlag = (flag) -> areDevicesRemovable = flag
+
 module.exports.init = (callback) ->
 	return callback null
 
@@ -23,8 +26,11 @@ module.exports.add = (customId, id, callback) ->
 			callback "Invalid CustomId"
 
 module.exports.remove = (customId, id, callback) ->
-	delete sensors[customId]
-	return callback null
+	if areDevicesRemovable
+		delete sensors[customId]
+		callback null
+	else
+		callback "Device not removable"
 
 module.exports.update = (oldCustomId, newCustomId, callback) ->
 	if sensors[newCustomId]
