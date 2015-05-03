@@ -21,6 +21,7 @@ describe 'Sensors Controller', ->
     before helpers.createDriver fixturesDriver.basicSensorDriver.file
     before (done) ->
         store["driver"] = helpers.getInStore('driver')
+        store["driverModule"] = require '../../server/drivers/' + fixturesDriver.basicSensorDriver.name + '/' + fixturesDriver.basicSensorDriver.name
         done null
 
     after  helpers.killServer
@@ -173,6 +174,10 @@ describe 'Sensors Controller', ->
         sensor = fixturesSensor.supportedSensor1
         
         before (done) ->
+            # We modify our test-driver so that it returns errors when asked to remove a device:
+            store["driverModule"].setRemovableFlag false
+            
+            # We add the device to try on:
             sensor.driverId = store.driver.id
             helpers.createSensor(sensor) () ->
                 store.sensorId = helpers.getInStore('sensor').id
@@ -184,9 +189,9 @@ describe 'Sensors Controller', ->
             @client.del "sensors/#{store.sensorId}", done
 
         it 'should return an error', ->
-            expect(@body).to.not.exist
             expect(@response.statusCode).to.equal 500
-            expect(@err).to.equal 'Server error while deleting sensor'
+            expect(@body).to.exist
+            expect(@body.error).to.equal 'Device not removable'
 
         it 'when we get the un-deleted Sensor (GET /sensors/:id)', (done) ->
             @client.get "sensors/#{store.sensorId}", done
