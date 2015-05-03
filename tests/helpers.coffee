@@ -66,7 +66,7 @@ module.exports =
         (done) ->
             baseSensor = new Sensor(data)
             Sensor.create baseSensor, (err, sensor) ->
-                @sensor = sensor
+                store.sensor = sensor
                 done err
 
     createDriver: (filename) ->

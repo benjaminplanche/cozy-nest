@@ -161,9 +161,9 @@ describe 'Sensors Controller', ->
             @client.get "sensors/#{store.sensorId}", done
             
         it 'should return an error', ->
-            expect(@body).to.not.exist
             expect(@response.statusCode).to.equal 404
-            expect(@err).to.equal 'Sensor not found'
+            expect(@body).to.exist
+            expect(@body.error).to.equal 'Sensor not found'
             
         it 'should have deleted the sensor from the Driver\'s data too', ->
             # @todo Implement test
@@ -180,7 +180,8 @@ describe 'Sensors Controller', ->
         # @todo Modify "remove" function of driver so that it returns an error: before helpers.updateDriver ...
 
         it 'should allow requests', (done) ->
-            @client.del "sensors/#{@sensor.id}", done
+            store.sensorId = helpers.getInStore('sensor').id
+            @client.del "sensors/#{store.sensorId}", done
 
         it 'should return an error', ->
             expect(@body).to.not.exist
@@ -188,14 +189,14 @@ describe 'Sensors Controller', ->
             expect(@err).to.equal 'Server error while deleting sensor'
 
         it 'when we get the un-deleted Sensor (GET /sensors/:id)', (done) ->
-            @client.get "sensors/#{@sensor.id}", done
+            @client.get "sensors/#{store.sensorId}", done
             
         it 'should return it', ->
             expect(@err).to.not.exist
             expect(@body.customId).to.equal fixturesSensor.supportedSensor1.customId
             expect(@body.name).to.equal fixturesSensor.supportedSensor1.name
             expect(@body.driverId).to.equal store.driver.id
-            expect(@body.id).to.equal @sensor.id
+            expect(@body.id).to.equal store.sensorId
             
         it 'should not have deleted the sensor from the Driver\'s data too', ->
             # @todo Implement test
