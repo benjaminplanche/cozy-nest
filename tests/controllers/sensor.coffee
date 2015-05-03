@@ -150,7 +150,7 @@ describe 'Sensors Controller', ->
     describe 'When we delete a Sensor (DELETE /sensors/:id) and its Driver allows it', ->
 
         it 'should allow requests', (done) ->
-            @client.delete "sensors/#{store.sensorId}", done
+            @client.del "sensors/#{store.sensorId}", done
 
         it 'should return a "success"', ->
             expect(@err).to.not.exist
@@ -180,7 +180,7 @@ describe 'Sensors Controller', ->
         # @todo Modify "remove" function of driver so that it returns an error: before helpers.updateDriver ...
 
         it 'should allow requests', (done) ->
-            @client.delete "sensors/#{@sensor.id}", done
+            @client.del "sensors/#{@sensor.id}", done
 
         it 'should return an error', ->
             expect(@body).to.not.exist
