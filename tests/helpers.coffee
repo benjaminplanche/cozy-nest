@@ -37,7 +37,7 @@ module.exports =
             host: 'localhost'
             port: TESTPORT
         start = require("#{prefix}server").start
-        start option, (app, server) ->
+        start option, (app, server) =>
             @server = server
             done null
 
