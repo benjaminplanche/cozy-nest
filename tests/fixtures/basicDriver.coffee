@@ -12,6 +12,8 @@ module.exports.isSensor = true
 areDevicesRemovable = true 
 module.exports.setRemovableFlag = (flag) -> areDevicesRemovable = flag
 
+module.exports.getSensor = (customId) -> return sensors[customId]
+
 module.exports.init = (callback) ->
 	return callback null
 
@@ -39,8 +41,8 @@ module.exports.update = (oldCustomId, newCustomId, callback) ->
 		
 		if isCustomIDValidExample newCustomId
 			# console.log("DRIVER - UPDATE IS VALID: " + newCustomId)
-			sensors[oldCustomId] = sensors[newCustomId]
-			sensors[newCustomId] = null
+			sensors[newCustomId] = sensors[oldCustomId]
+			sensors[oldCustomId] = null
 			callback null
 		else
 			# console.log("DRIVER - UPDATE IS NOT VALID: " + newCustomId)
