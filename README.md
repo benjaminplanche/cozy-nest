@@ -11,7 +11,7 @@ Clone this repository, install dependencies and run server (it requires Node.js)
     git clone git://github.com/Aldream/cozy-nest.git
     cd cozy-template
     npm install
-    node server.js
+    node server.coffee
 
 ## What is Cozy?
 
