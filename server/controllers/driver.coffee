@@ -36,7 +36,7 @@ module.exports.all = (req, res, next) ->
 module.exports.read = (req, res) ->
 	res.send req.driver
 
-module.exports.create = (req, res) ->
+module.exports.create = (req, res, next) ->
 		
 		# Parse form:
 		form = new multiparty.Form
@@ -56,8 +56,10 @@ module.exports.create = (req, res) ->
 			unless file = files['file']?[0]
 				res.send error: 'No file sent', 400
 				return cleanUp()
+
+			data = 
+				path : file
 				
-			data = path : file
 			Driver.create data, (err, driver) ->
 				if err?
 					if err == 'Driver already added'
