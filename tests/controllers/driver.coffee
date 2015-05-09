@@ -24,15 +24,10 @@ describe 'Drivers Controller', ->
 
     describe 'When we create a Sensor Driver (POST /drivers) as a Coffee script', ->
 
-        driver = fixturesDriver.basicDriver
-
-        before (done) ->
-            # copyFile(driver.file, )
-            # @todo Prepare driver data
-            done null
+        driver = fixturesDriver.basicSensorDriver
 
         it 'should allow requests', (done) ->
-            @client.post 'drivers', driver, done
+            @client.sendFile "drivers", driver.file, done
 
         it 'should reply with the created Driver', ->
             expect(@err).to.not.exist
@@ -45,15 +40,10 @@ describe 'Drivers Controller', ->
 
     describe 'When we try creating a 2nd Driver (POST /drivers) with the same name', ->
 
-        driver = fixturesDriver.basicDriver
-
-        before (done) ->
-            # copyFile(driver.file, )
-            # @todo Prepare driver data
-            done null
+        driver = fixturesDriver.basicSensorDriver
 
         it 'should allow requests', (done) ->
-            @client.post 'drivers', driver, done
+            @client.sendFile "drivers", driver.file, done
 
         it 'should reply with the previously-created Driver', ->
             expect(@err).to.not.exist
