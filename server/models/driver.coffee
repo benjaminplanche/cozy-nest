@@ -112,20 +112,18 @@ module.exports = class Driver extends cozydb.CozyModel
 	# create
 	# ====
 	# Adds a driver to the DB and system (unzipping its files and initializing its node module). If a similar driver already exists (same name), then this driver is returned.
-	# @param data (Object): 							Data defining the driver
+	# @param file (Object): 							Data defining the driver
 	# @param callback (Function(Error, Driver):null): 	Callback
 	###
-	@create: (data, callback) ->
+	@create: (file, callback) ->
 		superCreate = (data, callback) => super data, callback
-
-		file = 
-			path : data?.path
 
 		file.ext = path.extname(file.path)
 		unless file.ext in ['.zip', '.tar', '.tar.bz2', '.tar.gz', '.js', '.coffee']
 			return callback 'Unknown file extension', null
 
-		unless file.name = path.basename(file.path, file.ext)
+		file.name = path.basename(file.originalFilename, file.ext)
+		unless file.name
 			return callback 'Unknown file name', null
 		
 		# Check if this driver isn't already added (the name should be unique):
