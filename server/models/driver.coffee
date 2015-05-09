@@ -173,8 +173,8 @@ module.exports = class Driver extends cozydb.CozyModel
 					catch
 						callback 'Couldn\'t find module', null
 					
-					isActuator = driverModule.isActuator
-					isSensor = driverModule.isSensor
+					isActuator = driverModule.isActuator or false
+					isSensor = driverModule.isSensor or false
 					
 					unless isActuator or isSensor # or (!isActuator and !isSensor)
 						callback 'Driver not defining if for Sensors and/or Actuators', null
