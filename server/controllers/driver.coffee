@@ -58,8 +58,8 @@ module.exports.create = (req, res, next) ->
 				return cleanUp()
 
 			data = 
-				path : file
-				
+				path : file.path
+				originalFilename : file.originalFilename
 			Driver.create data, (err, driver) ->
 				if err?
 					if err == 'Driver already added'
