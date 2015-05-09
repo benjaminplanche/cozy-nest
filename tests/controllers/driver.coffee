@@ -30,6 +30,8 @@ describe 'Drivers Controller', ->
             @client.sendFile "drivers", driver.file, done
 
         it 'should reply with the created Driver', ->
+            @body = JSON.parse @body
+            
             expect(@err).to.not.exist
             expect(@response.statusCode).to.equal 201
             expect(@body.name).to.equal driver.name
