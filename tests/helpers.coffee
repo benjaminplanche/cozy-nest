@@ -119,7 +119,10 @@ module.exports =
                 clean()
                 old.del url, callbackFactory(done)
             sendFile: (url, path, done) ->
+                c = old.headers['Content-Type']
+                old.headers['Content-Type'] = 'multipart/form-data;'
                 old.sendFile url, path, callbackFactory(done)
+                old.headers['Content-Type'] =  c
             saveFile: (url, path, done) ->
                 old.saveFile url, path, callbackFactory(done)
 
