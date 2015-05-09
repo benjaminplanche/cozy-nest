@@ -7,7 +7,8 @@
 
 sensor			= require './sensor'
 actuator		= require './actuator'
-measure			= require './measure'
+measure         = require './measure'
+driver         = require './driver'
 rule			= require './rule'
 sensorRule		= require './sensorRule'
 actuatorRule	= require './actuatorRule'
@@ -19,6 +20,7 @@ module.exports =
     'actuatorId': 	param: actuator.fetch
     'ruleId': 		param: rule.fetch
     'measureId': 	param: measure.fetch
+    'driverId':     param: driver.fetch
 
     'sensors/?':
         get: sensor.all
@@ -41,6 +43,15 @@ module.exports =
         get: actuator.read
         put: actuator.update
         delete: actuator.delete
+
+    'drivers/?':
+        get: driver.all
+        post: driver.create
+
+    'drivers/:driverId/?':
+        get: driver.read
+        put: driver.update
+        delete: driver.delete
 
     'rules/?':
         get: rule.all
