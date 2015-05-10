@@ -17,6 +17,7 @@ store = {}
 describe 'Drivers Controller', ->
 
     before helpers.clearDB
+    before helpers.clearFiles
     before helpers.startServer
     before helpers.makeTestClient
 

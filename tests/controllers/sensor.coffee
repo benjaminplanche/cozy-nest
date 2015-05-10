@@ -16,6 +16,7 @@ store = {}
 describe 'Sensors Controller', ->
 
     before helpers.clearDB
+    before helpers.clearFiles
     before helpers.startServer
     before helpers.makeTestClient
     before helpers.createDriver fixturesDriver.basicSensorDriver.file
