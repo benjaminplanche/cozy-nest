@@ -63,7 +63,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 			name: @name
 			driverId: @driverId
 		# Update DB:
-		superUpdateAttributes data, (err, actuator) ->
+		superUpdateAttributes data, (err, actuator) =>
 			if err
 				callback err, actuator
 			else
