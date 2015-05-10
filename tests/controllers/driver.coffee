@@ -48,6 +48,8 @@ describe 'Drivers Controller', ->
             @client.sendFile "drivers", driver.file, done
 
         it 'should reply with the previously-created Driver', ->
+            @body = JSON.parse @body
+            
             expect(@err).to.not.exist
             expect(@response.statusCode).to.equal 202
             expect(@body.id).to.equal store.driverId
