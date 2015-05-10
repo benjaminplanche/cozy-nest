@@ -63,7 +63,6 @@ module.exports.create = (req, res, next) ->
 			Driver.create data, (err, driver) ->
 				if err?
 					if err == 'Driver already added'
-						console.log "DRIVER - ALREADY ADDED - " + driver.name + ", " + driver.id
 						res.send driver, 202
 					else
 						res.send error: 'Server error while creating Driver.', 500
