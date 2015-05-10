@@ -63,6 +63,7 @@ module.exports.create = (req, res, next) ->
 			Driver.create data, (err, driver) ->
 				if err?
 					if err == 'Driver already added'
+						console.log "DRIVER - ALREADY ADDED - " + driver.name + ", " + driver.id
 						res.send driver, 202
 					else
 						res.send error: 'Server error while creating Driver.', 500
@@ -73,11 +74,12 @@ module.exports.create = (req, res, next) ->
 
 module.exports.update = (req, res) ->
 	data = req.body
-	req.driver.updateAttributes data, (err, driver) ->
-		if err?
-			res.send error: 'Server error while saving Driver', 500
-		else
-			res.send driver, 200
+	res.send error: 'Drivers can\'t be updated', 401
+	# req.driver.updateAttributes data, (err, driver) ->
+	# 	if err?
+	# 		res.send error: 'Server error while saving Driver', 500
+	# 	else
+	# 		res.send driver, 200
 
 module.exports.delete = (req, res) ->
 	req.driver.destroy (err) ->
