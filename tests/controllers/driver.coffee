@@ -108,3 +108,46 @@ describe 'Drivers Controller', ->
             expect(@response.statusCode).to.equal 404
             expect(@body).to.exist
             expect(@body.error).to.equal 'Driver not found'
+
+    # @todo Find why required JS drivers are "undefined"
+    # describe 'When we create a Sensor Driver (POST /drivers) as a JS script', ->
+
+    #     driver = fixturesDriver.basicSensorDriverJS
+
+    #     before (done) ->
+    #         @client.get "drivers/#{store.driverId}", done
+
+    #     it 'should allow requests', (done) ->
+    #         @client.sendFile "drivers", driver.file, done
+
+    #     it 'should reply with the created Driver', ->
+    #         console.log "DRIVER - POST REP: " + @body
+    #         @body = JSON.parse @body
+    #         expect(@err).to.not.exist
+    #         expect(@response.statusCode).to.equal 201
+    #         expect(@body.name).to.equal driver.name
+    #         expect(@body.isSensor).is.true
+    #         expect(@body.isActuator).is.false
+    #         expect(@body.id).to.exist
+    #         store.driverId = @body.id
+
+    describe 'When we create a Sensor Driver (POST /drivers) as a ZIP archive', ->
+
+        driver = fixturesDriver.basicSensorDriverZip
+
+        before (done) ->
+            @client.get "drivers/#{store.driverId}", done
+
+        it 'should allow requests', (done) ->
+            @client.sendFile "drivers", driver.file, done
+
+        it 'should reply with the created Driver', ->
+            @body = JSON.parse @body
+            
+            expect(@err).to.not.exist
+            expect(@response.statusCode).to.equal 201
+            expect(@body.name).to.equal driver.name
+            expect(@body.isSensor).is.true
+            expect(@body.isActuator).is.false
+            expect(@body.id).to.exist
+            store.driverId = @body.id
