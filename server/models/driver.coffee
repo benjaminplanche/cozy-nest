@@ -48,14 +48,14 @@ module.exports = class Driver extends cozydb.CozyModel
 			(cb) ->
 				if thisDriver.isSensor
 					# @todo Perf: use a request Sensor.countByDriver (with a reduce) instead?
-					Sensor.byDriver thisDriver (err, sensors) ->
+					Sensor.byDriver thisDriver, (err, sensors) ->
 						cb err, sensors?.length
 				else cb null, 0
 			,
 			(cb) ->
 				if thisDriver.isActuator
 					# @todo Perf: use a request Actuator.countByDriver (with a reduce) instead?
-					Actuator.byDriver thisDriver (err, actuators) ->
+					Actuator.byDriver thisDriver, (err, actuators) ->
 						cb err, actuators?.length
 				else cb null, 0
 		 ], (err, results) ->
