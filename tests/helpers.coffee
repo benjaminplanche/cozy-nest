@@ -10,7 +10,7 @@ path = require 'path'
 os = require 'os'
 fs = require 'fs'
 mkdirp = require 'mkdirp'
-async = require 'async'
+rimraf = require 'rimraf'
 fixtures = require 'cozy-fixtures'
 if process.env.USE_JS
     prefix = path.join __dirname, '../build/'
@@ -46,25 +46,7 @@ module.exports =
         @server.close()
 
     clearFiles: (done) ->
-        fs.readdir DRIVERS_DIR, (err, directories) ->
-            return done 'Could not delete files' if err
-
-            async.each directories, (dir, cb) ->
-                dir = path.resolve DRIVERS_DIR, dir
-                fs.readdir dir, (err, files) ->
-                    return cb 'Could not delete files' if err
-
-                    async.each files, (file, cb2) ->
-                        file = path.resolve dir, file
-                        fs.unlink file, (err) ->
-                            console.log 'Could not delete %s', file if err
-                            cb2 null # loop anyway
-                    , ->
-                        fs.rmdir dir, (err) ->
-                            cb err
-            , ->
-                fs.rmdir DRIVERS_DIR, (err) ->
-                    done err
+        rimraf DRIVERS_DIR, done
 
     clearDB: (done) ->
          fixtures.resetDatabase callback: done
