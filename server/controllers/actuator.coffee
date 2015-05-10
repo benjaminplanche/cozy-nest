@@ -27,23 +27,25 @@ module.exports.read = (req, res) ->
 module.exports.create = (req, res) ->
 	data = req.body
 	Actuator.create data, (err, actuator) ->
-		if err?
-			# @todo Special case when error is 'Device already added'?
-			res.send error: "Server error while creating actuator.", 500
+		if err
+			if err == 'Device already added'
+				res.send actuator, 202
+			else
+				res.send error: err, 500
 		else
 			res.send actuator, 201
 
 module.exports.update = (req, res) ->
 	data = req.body
 	req.actuator.updateAttributes data, (err, actuator) ->
-		if err?
-			res.send error: "Server error while saving actuator", 500
+		if err
+			res.send error: err, 500
 		else
 			res.send actuator, 200
 
 module.exports.delete = (req, res) ->
 	req.actuator.destroy (err) ->
-		if err?
-			res.send error: "Server error while deleting actuator", 500
+		if err
+			res.send error: err, 500
 		else
 			res.send success: true, 200
