@@ -81,10 +81,12 @@ describe 'Drivers Controller', ->
     describe 'When we update a driver (PUT /drivers/:id)', ->
 
         it 'should allow requests', (done) ->
-            @client.put "drivers/#{store.driverId}", fixturesdriver.validUpdateForTestdriver, done
+            @client.put "drivers/#{store.driverId}", fixturesDriver.validUpdateForTestdriver, done
 
         it 'should reply with an error (not allowed)', ->
-            # @todo
+            expect(@response.statusCode).to.equal 401
+            expect(@body).to.exist
+            expect(@body.error).to.equal 'Drivers can\'t be updated'
 
     describe 'When we delete a Driver (DELETE /drivers/:id)', ->
 
