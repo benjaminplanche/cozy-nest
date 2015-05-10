@@ -12,10 +12,9 @@ fs = require 'fs'
 multiparty = require 'multiparty'
 path = require 'path'
 mkdirp = require 'mkdirp'
-decompress = require 'decompress'
 async = require 'async'
 rimraf = require 'rimraf'
-copyFile = require('../helpers').copyFile
+{copyFile, decompress} = require('../helpers')
 cozydb = require 'cozydb'
 
 Sensor = require './sensor'
@@ -118,7 +117,7 @@ module.exports = class Driver extends cozydb.CozyModel
 		superCreate = (data, callback) => super data, callback
 
 		file.ext = path.extname(file.path)
-		unless file.ext in ['.zip', '.tar', '.tar.bz2', '.tar.gz', '.js', '.coffee']
+		unless file.ext in ['.zip', '.js', '.coffee'] # , '.tar', '.tar.bz2', '.tar.gz']
 			return callback 'Unknown file extension', null
 
 		file.name = path.basename(file.originalFilename, file.ext)
@@ -138,17 +137,7 @@ module.exports = class Driver extends cozydb.CozyModel
 
 				if file.ext in ['.zip', '.tar', '.tar.bz2', '.tar.gz']
 					# Unzip it:
-					plug = [
-						'.zip' : decompress.zip,
-						'.tar' : decompress.tar,
-						'.tar.bz2' : decompress.tarbz2,
-						'.tar.gz' : decompress.targz][file.ext]
-						
-					new decompress( mode: '755' )
-					 .src file.path
-					 .dest DRIVERS_DIR
-					 .use plug strip: 1
-					 .run (err) ->
+					decompress file.path, DRIVERS_DIR, file.ext, (err) ->
 						if err
 							callback 'Error unzipping the driver', null
 						else
@@ -171,6 +160,7 @@ module.exports = class Driver extends cozydb.CozyModel
 						driverModule = require modulePath
 					catch
 						callback 'Couldn\'t find module', null
+					console.log "MODULE: " + JSON.stringify driverModule
 					
 					isActuator = driverModule.isActuator or false
 					isSensor = driverModule.isSensor or false
