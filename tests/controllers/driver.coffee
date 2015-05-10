@@ -65,7 +65,7 @@ describe 'Drivers Controller', ->
 
         it 'should reply with the corresponding driver', ->
             expect(@err).to.not.exist
-            expect(@body.name).to.equal fixturesDriver.basicDriver.name
+            expect(@body.name).to.equal fixturesDriver.basicSensorDriver.name
             expect(@body.id).to.equal store.driverId
 
             
