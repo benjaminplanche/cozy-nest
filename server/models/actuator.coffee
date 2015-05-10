@@ -115,7 +115,7 @@ module.exports = class Actuator extends cozydb.CozyModel
 							return
 						
 						# Let the driver handle the integration of the device to the system:
-						actuatorsDrivers[driverId].add customId, actuator.id, (err) ->
+						actuatorsDrivers[actuator.driverId].add actuator.customId, actuator.id, (err) ->
 							if err
 								# Cancelling modif:
 								thisActuator.requestDestroy "all", {key: actuator.id}, (err) ->
