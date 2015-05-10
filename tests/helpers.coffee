@@ -73,6 +73,7 @@ module.exports =
                 
                 fileData =
                     path: os.tmpdir() + "/" + extName
+                    originalFilename : extName
 
                 Driver.create fileData, (err, driver) ->
                     store.driver = driver
