@@ -13,7 +13,7 @@ module.exports.isActuator = true
 areDevicesRemovable = true 
 module.exports.setRemovableFlag = (flag) -> areDevicesRemovable = flag
 
-module.exports.getSensor = (customId) -> return actuators[customId]
+module.exports.getActuator = (customId) -> return actuators[customId]
 module.exports.getApplyCall = (num) -> return applyCalls[num]
 
 module.exports.init = (callback) ->
