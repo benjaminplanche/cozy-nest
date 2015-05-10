@@ -9,6 +9,9 @@ os = require 'os'
 fs = require 'fs'
 
 module.exports = 
+	basicActuatorDriver:
+		name: "basicActuatorDriver"
+		file: __dirname + "/basicActuatorDriver.coffee"
 	basicSensorDriver:
 		name: "basicDriver"
 		file: __dirname + "/basicDriver.coffee"
