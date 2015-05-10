@@ -21,6 +21,7 @@ Client = require('request-json').JsonClient
 ds = require 'cozydb/lib/utils/client'
 
 Sensor = require "#{prefix}server/models/sensor"
+Actuator = require "#{prefix}server/models/actuator"
 Driver = require "#{prefix}server/models/driver"
 
 TESTPORT = process.env.PORT or 8013
@@ -59,6 +60,13 @@ module.exports =
             baseSensor = new Sensor(data)
             Sensor.create baseSensor, (err, sensor) ->
                 store.sensor = sensor
+                done err
+
+    createActuator: (data) ->
+        (done) ->
+            baseActuator = new Actuator(data)
+            Actuator.create baseActuator, (err, actuator) ->
+                store.actuator = actuator
                 done err
 
     createDriver: (filename) ->
