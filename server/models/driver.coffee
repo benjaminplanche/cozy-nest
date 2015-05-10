@@ -66,23 +66,22 @@ module.exports = class Driver extends cozydb.CozyModel
 			else
 				# Stop the driver and delete it (files + instance in DB):
 				async.parallel [
-					(cb) -> superDestroy ((err) -> cb 'Error removing driver from DB', null)
+					(cb) -> superDestroy cb
 					,
 					(cb) ->
-						modulePath = DRIVERS_DIR + thisDriver.name
+						dirPath = DRIVERS_DIR + thisDriver.name + "/"
+						modulePath = path.resolve  dirPath, thisDriver.name
 						# Removing module from cache:
 						delete require.cache[require.resolve(modulePath)]
 						# Deleting module directory:
-						rimraf (modulePath), ((err) -> cb 'Error removing driver\'s files', null)
+						rimraf dirPath, cb
 					,
 					(cb) -> 
-						err = null
 						try
 							delete sensorsDrivers[thisDriver.id] if thisDriver.isSensor
 							delete actuatorsDrivers[thisDriver.id] if thisDriver.isActuator
-						catch e
-							err = 'Error removing driver\'s module'
-						finally
+							cb null, null
+						catch err
 							cb err, null
 				], (err, results) ->
 					callback err
