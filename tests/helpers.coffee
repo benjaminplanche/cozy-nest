@@ -22,6 +22,9 @@ ds = require 'cozydb/lib/utils/client'
 
 Sensor = require "#{prefix}server/models/sensor"
 Actuator = require "#{prefix}server/models/actuator"
+Rule = require "#{prefix}server/models/rule"
+SensorRule = require "#{prefix}server/models/sensorRule"
+ActuatorRule = require "#{prefix}server/models/actuatorRule"
 Driver = require "#{prefix}server/models/driver"
 
 TESTPORT = process.env.PORT or 8013
@@ -67,6 +70,27 @@ module.exports =
             baseActuator = new Actuator(data)
             Actuator.create baseActuator, (err, actuator) ->
                 store.actuator = actuator
+                done err
+
+    createRule: (data) ->
+        (done) ->
+            baseRule = new Rule(data)
+            Rule.create baseRule, (err, rule) ->
+                store.rule = rule
+                done err
+
+    createSensorRule: (data) ->
+        (done) ->
+            baseSensorRule = new SensorRule(data)
+            SensorRule.create baseRule, (err, sensorRule) ->
+                store.sensorRule = sensorRule
+                done err
+
+    createActuatorRule: (data) ->
+        (done) ->
+            baseActuatorRule = new ActuatorRule(data)
+            Actuator.create baseRule, (err, actuatorRule) ->
+                store.actuatorRule = actuatorRule
                 done err
 
     createDriver: (filename) ->
