@@ -83,6 +83,6 @@ module.exports.update = (req, res) ->
 module.exports.delete = (req, res) ->
 	req.driver.destroy (err) ->
 		if err?
-			res.send error: 'Server error while deleting Driver', 500
+			res.send error: err, 500
 		else
 			res.send success: true, 200
