@@ -41,6 +41,7 @@ describe 'Sensors Controller', ->
         it 'should reply with the created Sensor', ->
             expect(@err).to.not.exist
             expect(@response.statusCode).to.equal 201
+            expect(@body).to.exist
             expect(@body.customId).to.equal sensor.customId
             expect(@body.name).to.equal sensor.name
             expect(@body.driverId).to.equal sensor.driverId
@@ -177,13 +178,12 @@ describe 'Sensors Controller', ->
 
     describe 'When we delete a Sensor (DELETE /sensors/:id) and its Driver doesn\'t allow it', ->
        
-        sensor = fixturesSensor.supportedSensor1
-        
         before (done) ->
             # We modify our test-driver so that it returns errors when asked to remove a device:
             store["driverModule"].setRemovableFlag false
             
             # We add the device to try on:
+            sensor = fixturesSensor.supportedSensor1
             sensor.driverId = store.driver.id
             helpers.createSensor(sensor) () ->
                 store.sensorId = helpers.getInStore('sensor').id
