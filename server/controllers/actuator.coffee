@@ -43,6 +43,14 @@ module.exports.update = (req, res) ->
 		else
 			res.send actuator, 200
 
+module.exports.apply = (req, res) ->
+	data = req.body
+	req.actuator.apply data.value, (err) ->
+		if err
+			res.send error: err, 400
+		else
+			res.send success: true, 202
+
 module.exports.delete = (req, res) ->
 	req.actuator.destroy (err) ->
 		if err

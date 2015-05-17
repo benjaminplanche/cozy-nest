@@ -26,18 +26,21 @@ module.exports =
         get: sensor.all
         post: sensor.create
 
+    'sensors/:sensorId/measures?':
+        # @todo Get by Sensor + Date (opt): get: sensor.getMeasuresByDate
+        post: sensor.createMeasure
+
     'sensors/:sensorId/?':
         get: sensor.read
         put: sensor.update
         delete: sensor.delete
 
-    'sensors/:sensorId/measures?':
-        # @todo Get by Sensor + Date (opt): get: sensor.getMeasuresByDate
-        post: sensor.createMeasure
-
     'actuators/?':
         get: actuator.all
         post: actuator.create
+
+    'actuators/:actuatorId/apply?':
+        post: actuator.apply
 
     'actuators/:actuatorId/?':
         get: actuator.read
