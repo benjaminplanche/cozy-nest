@@ -27,3 +27,6 @@ module.exports =
 		
 	invalidUpdateForTestActuator:
 		customId: "IDDefinitelyNotAValidValue"
+		
+	validApplyValueForTestActuator:
+		value: "FLY"

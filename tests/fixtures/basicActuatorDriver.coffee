@@ -37,7 +37,7 @@ module.exports.remove = (customId, id, callback) ->
 		callback "Device not removable"
 
 module.exports.apply = (customId, value, callback) ->
-	applyCalls.push [customId, value]
+	applyCalls.push {customId: customId, value: value}
 	callback null
 
 module.exports.update = (oldCustomId, newCustomId, callback) ->

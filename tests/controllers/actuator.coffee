@@ -127,6 +127,23 @@ describe 'Actuators Controller', ->
             expect(store["driverModule"].getActuator(fixturesActuator.supportedActuator1.customId)).to.not.exist
             expect(store["driverModule"].getActuator(fixturesActuator.validUpdateForTestActuator.customId)).to.equal store.actuatorId
         
+    describe 'When we ask the Actuator to apply a value (PUT /actuators/:id/apply) with data considered valid by its Driver', ->
+
+        it 'should allow requests', (done) ->
+            @client.post "actuators/#{store.actuatorId}/apply", fixturesActuator.validApplyValueForTestActuator, done
+
+        it 'should return a "success"', ->
+            expect(@err).to.not.exist
+            expect(@response.statusCode).to.equal 202
+            expect(@body.success).to.equal true
+
+        it 'should have updated the Driver\'s data too', ->
+            driverApplyLog0 = store["driverModule"].getApplyCall 0
+            expect(driverApplyLog0).to.exist
+            expect(driverApplyLog0.customId).to.equal fixturesActuator.validUpdateForTestActuator.customId
+            expect(driverApplyLog0.value).to.equal fixturesActuator.validApplyValueForTestActuator.value
+            expect(store["driverModule"].getApplyCall(1)).to.not.exist
+
     describe 'When we update an Actuator (PUT /actuators/:id) with data considered invalid by its Driver', ->
 
         update = fixturesActuator.invalidUpdateForTestActuator
