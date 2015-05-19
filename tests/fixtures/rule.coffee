@@ -8,6 +8,9 @@
 module.exports = 
 	rule1:
 		name: "Rule #1"
+		
+	updateRule1:
+		name: "Rule #1 v2"
 
 	actuatorRuleSayHello:
 		ruleId:		null
