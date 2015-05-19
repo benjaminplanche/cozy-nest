@@ -28,7 +28,7 @@ module.exports.create = (req, res) ->
 	data = req.body
 	Rule.create data, (err, rule) ->
 		if err?
-			res.send error: "Server error while creating rule.", 500
+			res.send error: err, 500
 		else
 			res.send rule, 201
 
@@ -36,7 +36,7 @@ module.exports.createSensorRule = (req, res) ->
 	data = req.body
 	req.rule.createSensorRule data, (err, sensorRule) ->
 		if err
-			res.send error: "Server error while creating SensorRule.", 500
+			res.send error: err, 500
 		else
 			res.send sensorRule, 201
 
@@ -45,21 +45,22 @@ module.exports.createActuatorRule = (req, res) ->
 	data = req.body
 	req.rule.createActuatorRule data, (err, actuatorRule) ->
 		if err
-			res.send error: "Server error while creating ActuatorRule.", 500
+			res.send error: err, 500
 		else
 			res.send actuatorRule, 201
 
 module.exports.update = (req, res) ->
 	data = req.body
-	req.rule.update data, (err, rule) ->
-		if err?
-			res.send error: "Server error while saving rule", 500
+	req.rule.updateAttributes data, (err, rule) ->
+		console.log("RULE UPDATE - rule: " + rule)
+		if err
+			res.send error: err, 500
 		else
 			res.send rule, 200
 
 module.exports.delete = (req, res) ->
 	req.rule.destroy (err) ->
-		if err?
-			res.send error: "Server error while deleting rule", 500
+		if err
+			res.send error: err, 500
 		else
 			res.send success: true, 200
