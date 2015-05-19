@@ -113,7 +113,7 @@ module.exports = class Rule extends cozydb.CozyModel
 					if err
 						cb 'Error while deleting the conditions (SensorRules) associated: '+err
 					msgErr = ''
-					partialCallback = partialErr ->
+					partialCallback = (partialErr) ->
 						msgErr += 'Error while deleting SensorRule: ' + partialErr + '\n'
 					
 					sensorRule.destroy partialCallback for sensorRule in sensorRules
@@ -125,7 +125,7 @@ module.exports = class Rule extends cozydb.CozyModel
 					if err
 						cb 'Error while deleting the conditions (ActuatorRules) associated: '+err
 					msgErr = ''
-					partialCallback = partialErr ->
+					partialCallback = (partialErr) ->
 						msgErr += 'Error while deleting ActuatorRule: ' + partialErr + '\n'
 					
 					actuatorRule.destroy partialCallback for actuatorRule in actuatorRules
