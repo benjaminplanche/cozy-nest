@@ -158,7 +158,6 @@ describe 'Drivers Controller', ->
     #         @client.sendFile "drivers", driver.file, done
 
     #     it 'should reply with the created Driver', ->
-    #         console.log "DRIVER - POST REP: " + @body
     #         @body = JSON.parse @body
     #         expect(@err).to.not.exist
     #         expect(@response.statusCode).to.equal 201
