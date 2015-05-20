@@ -52,7 +52,6 @@ module.exports.createActuatorRule = (req, res) ->
 module.exports.update = (req, res) ->
 	data = req.body
 	req.rule.updateAttributes data, (err, rule) ->
-		console.log("RULE UPDATE - rule: " + rule)
 		if err
 			res.send error: err, 500
 		else

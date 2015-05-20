@@ -43,7 +43,6 @@ module.exports.decompress = (src, dst, ext, callback) ->
         unzipper = new decompress(src)
 
         unzipper.on 'error', (err) ->
-            console.log "DRIVER - ERR: " + err
             callback err
         
         unzipper.on 'extract', (log) ->

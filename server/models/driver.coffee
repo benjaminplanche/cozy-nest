@@ -160,7 +160,6 @@ module.exports = class Driver extends cozydb.CozyModel
 						driverModule = require modulePath
 					catch
 						callback 'Couldn\'t find module', null
-					console.log "MODULE: " + JSON.stringify driverModule
 					
 					isActuator = driverModule.isActuator or false
 					isSensor = driverModule.isSensor or false
