@@ -209,3 +209,12 @@ describe 'Sensors Controller', ->
             
         it 'should not have deleted the sensor from the Driver\'s data too', ->
             expect(store["driverModule"].getSensor(fixturesSensor.supportedSensor1.customId)).to.equal store.sensorId
+        
+        it 'should be deleted if the Driver allows it that time', (done) ->
+            store["driverModule"].setRemovableFlag true
+            @client.del "sensors/#{store.sensorId}", done
+
+        it 'should return a "success"', ->
+            expect(@err).to.not.exist
+            expect(@response.statusCode).to.equal 200
+            expect(@body.success).to.equal true
