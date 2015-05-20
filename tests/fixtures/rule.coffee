@@ -43,3 +43,10 @@ module.exports =
 		intervalStart: 	1
 		intervalEnd: 	1
 
+	updateSensorRule:
+		ruleId:			null
+		sensorId:		null
+		type: 			"newType"
+		intervalStart: 	-10
+		intervalEnd: 	10
+
