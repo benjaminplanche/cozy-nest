@@ -65,21 +65,8 @@ describe 'Rules Controller', ->
                 module: require '../../server/drivers/' + fixturesDriver.basicActuatorDriver.name + '/' + fixturesDriver.basicActuatorDriver.name
             done null
 
-    before (done) ->
-        sensor = fixturesSensor.supportedSensor1
-        sensor.driverId = store.driverSensor.instance.id
-        helpers.createActuator(sensor) () ->
-            store["sensor"] = helpers.getInStore('sensor')
-            done null
 
-    before (done) ->
-        actuator = fixturesActuator.supportedActuator1
-        actuator.driverId = store.driverActuator.instance.id
-        helpers.createActuator(actuator) () ->
-            store["actuator"] = helpers.getInStore('actuator')
-            done null
-
-    after  helpers.killServer
+    after helpers.killServer
     after helpers.clearFiles
 
     describe 'When we create a Rule (POST /rules)', ->
