@@ -81,7 +81,6 @@ module.exports = class Sensor extends cozydb.CozyModel
 	# @param callback (Function(Error, Measure):null):	Callback
 	###
 	createMeasure: (data, callback) ->
-		sanitize data
 		data.sensorId = @id
 		Measure.create data callback
 	
