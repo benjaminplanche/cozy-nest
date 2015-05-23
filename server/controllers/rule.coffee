@@ -40,6 +40,13 @@ module.exports.createSensorRule = (req, res) ->
 		else
 			res.send sensorRule, 201
 
+module.exports.deleteSensorRule = (req, res) ->
+	req.rule.destroySensorRule req.sensorRule, (err) ->
+		if err
+			res.send error: err, 500
+		else
+			res.send success: true, 200
+
 
 module.exports.createActuatorRule = (req, res) ->
 	data = req.body

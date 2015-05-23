@@ -27,11 +27,11 @@ module.exports.read = (req, res) ->
 module.exports.update = (req, res) ->
 	# @todo Prevent from updating ruleId and sensorId (or verify consistency of new ones)
 	data = req.body
-	req.sensorRule.update data, (err, sensorRule) ->
+	req.sensorRule.updateAttributes data, (err, sensorRule) ->
 		if err?
 			res.send error: "Server error while saving SensorRule", 500
 		else
-			res.send sensorRule, 200
+			res.send req.sensorRule, 200
 
 module.exports.delete = (req, res) ->
 	req.sensorRule.destroy (err) ->

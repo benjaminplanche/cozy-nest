@@ -8,7 +8,7 @@
 sensor			= require './sensor'
 actuator		= require './actuator'
 measure         = require './measure'
-driver         = require './driver'
+driver          = require './driver'
 rule			= require './rule'
 sensorRule		= require './sensorRule'
 actuatorRule	= require './actuatorRule'
@@ -19,8 +19,9 @@ module.exports =
     'sensorId': 	param: sensor.fetch
     'actuatorId': 	param: actuator.fetch
     'ruleId': 		param: rule.fetch
-    'measureId': 	param: measure.fetch
+    'measureId':    param: measure.fetch
     'driverId':     param: driver.fetch
+    'sensorRuleId': param: sensorRule.fetch
 
     'sensors/?':
         get: sensor.all
@@ -56,6 +57,21 @@ module.exports =
         put: driver.update
         delete: driver.delete
 
+    'rules/:ruleId/sensorRules/?':
+        # @todo Get by Rule: get: sensor.getSensorRules
+        post: rule.createSensorRule
+
+    'rules/:ruleId/sensorRules/:sensorRuleId?':
+        # @todo Get by Rule: get: sensor.getSensorRules
+        get: sensorRule.read
+        put: sensorRule.update
+        delete: rule.deleteSensorRule
+    
+
+    'rules/:ruleId/actuatorRules/?':
+        # @todo Get by Rule: get: sensor.getActuatorRules
+        post: rule.createActuatorRule
+
     'rules/?':
         get: rule.all
         post: rule.create
@@ -64,12 +80,3 @@ module.exports =
         get: rule.read
         put: rule.update
         delete: rule.delete
-
-    'rules/:ruleId/sensorRules?':
-        # @todo Get by Rule: get: sensor.getSensorRules
-        post: rule.createSensorRule
-	
-
-    'rules/:ruleId/actuatorRules?':
-        # @todo Get by Rule: get: sensor.getActuatorRules
-        post: rule.createActuatorRule
