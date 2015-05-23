@@ -26,27 +26,25 @@ module.exports =
 		ruleId:			null
 		sensorId:		null
 		type: 			"movement"
-		intervalStart: 	5
-		intervalEnd: 	10
+		intervalStart: 	"5"
+		intervalEnd: 	"10"
 
 	sensorRuleIsNotMoving:
 		ruleId:			null
 		sensorId:		null
 		type: 			"movement"
-		intervalStart: 	5
-		intervalEnd: 	10
+		intervalStart: 	"5"
+		intervalEnd: 	"10"
 
 	sensorRuleIsButtonPressed:
 		ruleId:			null
 		sensorId:		null
 		type: 			"button"
-		intervalStart: 	1
-		intervalEnd: 	1
+		intervalStart: 	"1"
+		intervalEnd: 	"1"
 
 	updateSensorRule:
-		ruleId:			null
-		sensorId:		null
 		type: 			"newType"
-		intervalStart: 	-10
-		intervalEnd: 	10
+		intervalStart: 	"-10"
+		intervalEnd: 	"10"
 

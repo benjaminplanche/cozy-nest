@@ -46,22 +46,21 @@ describe 'SensorRules Controller', ->
     after helpers.killServer
     after helpers.clearFiles
 
-    describe 'When we create a SensorRule (POST /rule/:ruleId/sensorRules)', ->
+    describe 'When we create a SensorRule (POST /rules/:ruleId/sensorRules)', ->
 
         sensorRule = fixturesRule.sensorRuleIsMoving
 
         before (done) ->
-            sensorRule.ruleId = store.rule.id
             sensorRule.sensorId = store.sensor.id
             done null
 
         it 'should allow requests', (done) ->
-            @client.post 'rules/#{store.rule.id}/sensorRules', sensorRule, done
+            @client.post "rules/#{store.rule.id}/sensorRules", sensorRule, done
 
         it 'should reply with the created SensorRule', ->
             expect(@err).to.not.exist
             expect(@response.statusCode).to.equal 201
-            expect(@body.ruleId).to.equal sensorRule.ruleId
+            expect(@body.ruleId).to.equal store.rule.id
             expect(@body.sensorId).to.equal sensorRule.sensorId
             expect(@body.type).to.equal sensorRule.type
             expect(@body.intervalStart).to.equal sensorRule.intervalStart
@@ -69,7 +68,7 @@ describe 'SensorRules Controller', ->
             expect(@body.id).to.exist
             store.sensorRuleId = @body.id
 
-    describe 'When we try creating a SensorRule (POST /rule/:ruleId/sensorRules) associated with an unknown Sensor', ->
+    describe 'When we try creating a SensorRule (POST /rules/:ruleId/sensorRules) associated with an unknown Sensor', ->
 
         sensorRule = fixturesRule.sensorRuleIsMoving
 
@@ -78,14 +77,14 @@ describe 'SensorRules Controller', ->
             done null
 
         it 'should allow requests', (done) ->
-            @client.post 'rules/#{store.rule.id}/sensorRules', sensorRule, done
+            @client.post "rules/#{store.rule.id}/sensorRules", sensorRule, done
 
         it 'should reply with an error', ->
             expect(@response.statusCode).to.equal 500
             expect(@body).to.exist
             expect(@body.error).to.equal 'Sensor associated to this rule doesn\'t exist'
 
-    describe 'When we get a SensorRule (GET /rule/:ruleId/sensorRules/:id) which exists', ->
+    describe 'When we get a SensorRule (GET /rules/:ruleId/sensorRules/:id) which exists', ->
 
         it 'should allow requests', (done) ->
             @client.get "rules/#{store.rule.id}/sensorRules/#{store.sensorRuleId}", done
@@ -94,15 +93,14 @@ describe 'SensorRules Controller', ->
             expect(@err).to.not.exist
             expect(@response.statusCode).to.equal 200
             expect(@body.ruleId).to.equal store.rule.id
-            expect(@body.ruleId).to.equal store.sensor.id
-            expect(@body.sensorId).to.equal sensorRule.sensorId
+            expect(@body.sensorId).to.equal store.sensor.id
             expect(@body.type).to.equal fixturesRule.sensorRuleIsMoving.type
             expect(@body.intervalStart).to.equal fixturesRule.sensorRuleIsMoving.intervalStart
             expect(@body.intervalEnd).to.equal fixturesRule.sensorRuleIsMoving.intervalEnd
             expect(@body.id).to.equal store.sensorRuleId
 
             
-    describe 'When we get a SensorRule (GET /rule/:ruleId/sensorRules/:id) which doesn\'t exist', ->
+    describe 'When we get a SensorRule (GET /rules/:ruleId/sensorRules/:id) which doesn\'t exist', ->
         
         it 'should allow requests', (done) ->
             id = store.sensorRuleId + 404 # since "store.sensorRuleId" is the only correct ID in DB, "store.sensorRuleId + 404" is not.
@@ -113,23 +111,22 @@ describe 'SensorRules Controller', ->
             expect(@body).to.exist
             expect(@body.error).to.equal 'SensorRule not found'
 
-    describe 'When we update a sensorRule (PUT /rule/:ruleId/sensorRules/:id)', ->
+    describe 'When we update a sensorRule (PUT /rules/:ruleId/sensorRules/:id)', ->
 
         it 'should allow requests', (done) ->
             @client.put "rules/#{store.rule.id}/sensorRules/#{store.sensorRuleId}", fixturesRule.updateSensorRule, done
 
-        it 'should reply with the updated sensorRules', ->
+        it 'should reply with the updated sensorRule', ->
             expect(@err).to.not.exist
             expect(@response.statusCode).to.equal 200
             expect(@body.ruleId).to.equal store.rule.id
-            expect(@body.ruleId).to.equal store.sensor.id
-            expect(@body.sensorId).to.equal sensorRule.sensorId
+            expect(@body.sensorId).to.equal store.sensor.id
             expect(@body.type).to.equal fixturesRule.updateSensorRule.type
             expect(@body.intervalStart).to.equal fixturesRule.updateSensorRule.intervalStart
             expect(@body.intervalEnd).to.equal fixturesRule.updateSensorRule.intervalEnd
             expect(@body.id).to.equal store.sensorRuleId
 
-    describe 'When we delete a SensorRule (DELETE /rule/:ruleId/sensorRules/:id)', ->
+    describe 'When we delete a SensorRule (DELETE /rules/:ruleId/sensorRules/:id)', ->
 
         it 'should allow requests', (done) ->
             @client.del "rules/#{store.rule.id}/sensorRules/#{store.sensorRuleId}", done
