@@ -62,7 +62,6 @@ module.exports = class Rule extends cozydb.CozyModel
 	# @param callback (Function(Error, SensorRule):null):	Callback
 	###
 	createSensorRule: (data, callback) ->
-		sanitize data
 		data.ruleId = @id
 		rule = @
 		cb = (err, sensorRule) ->
@@ -77,12 +76,55 @@ module.exports = class Rule extends cozydb.CozyModel
 						if err3
 							err2 += " AND " + err3
 						callback err2, null
-					return
-				callback null, sensorRule
+				else
+					callback null, sensorRule
 			# If the SensorRule (ie. condition) is already met, we let the Rule know:
 			if sensorRule.met
 				rule.incrementNbSensorRulesMet (err2) -> callback err2, sensorRule
-		SensorRule.createIfSensor data cb
+		SensorRule.create data, cb
+
+	###
+	# destroySensorRule
+	# ====
+	# Destroys a SensorRule, and updates the information of the Rule it belonged to.
+	# @param sensorRule (SensorRule):				SensorRule to be deleted, belonging to the Rule
+	# @param callback (Function(Error):null):		Callback
+	###
+	destroySensorRule: (sensorRule, callback) ->
+		rule = @
+
+		# Decrementing the number of SensorRules this rule has:
+		unless sensorRule.ruleId == @id
+			callback "The SensorRule doesn't belong to this Rule."
+			return
+
+		async.parallel [
+			(cb) -> rule.decrementNbSensorRules cb
+			,
+			(cb) ->
+				if sensorRule.met
+					rule.decrementNbSensorRulesMet cb
+				else
+					cb null
+		 ], (err, res) ->
+			if err
+				callback err
+				return
+
+			sensorRule.destroy (err2) ->
+				if err2
+					# Cancelling modif:
+					rule.incrementNbSensorRules callback
+					return
+				
+				### @todo Think about use-cases before uncommenting below/
+				if rule.nbSensorRules == rule.nbSensorRulesMet
+					# The remaining conditions are met, so we apply the rule:
+					Rule.applyRules [rule], callback
+					return
+				###
+
+				callback null
 	
 	###
 	# createActuatorRule
@@ -92,9 +134,8 @@ module.exports = class Rule extends cozydb.CozyModel
 	# @param callback (Function(Error, ActuatorRule):null):	Callback
 	###
 	createActuatorRule: (data, callback) ->
-		sanitize data
 		data.ruleId = @id
-		ActuatorRule.createIfActuator data callback
+		ActuatorRule.create data, callback
 		
 	
 	###

@@ -18,35 +18,6 @@ module.exports = class SensorRule extends cozydb.CozyModel
 		intervalStart: 	type : String
 		intervalEnd: 	type : String
 	
-	###
-	# destroy
-	# ====
-	# Deletes the SensorRule, and updates the information of the Rule it belonged to.
-	# @param callback (Function(Error):null):		Callback
-	###
-	destroy: (callback) ->
-		sensorRule = @
-		superDestroy = (callback) => super callback
-		Rule.find @ruleId, (err, rule) ->
-			if err
-				callback 'Rule associated to this SensorRule couldn\'t be found: '+err
-				return
-			if !sensor
-				callback 'Rule associated to this SensorRule doesn\'t exist'
-				return
-			
-			rule.decrementNbSensorRules (err) ->
-				if err
-					callback 'Rule associated to this SensorRule couldn\'t be updated (to decrement its number of SensorRules): '+err
-				else
-					if sensorRule.met
-						rule.decrementNbSensorRulesMet (err) ->
-							if err
-								callback 'Rule associated to this SensorRule couldn\'t be updated (to decrement its number of met SensorRules): '+err
-							else
-								superDestroy callback
-					else
-						superDestroy callback
 	
 	###
 	# create
@@ -61,7 +32,7 @@ module.exports = class SensorRule extends cozydb.CozyModel
 			if err
 				callback 'Sensor associated to this rule couldn\'t be found: '+err, null
 				return
-			if !sensor
+			unless sensor
 				callback 'Sensor associated to this rule doesn\'t exist', null
 				return
 			
