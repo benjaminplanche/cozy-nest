@@ -9,7 +9,9 @@ Measure = require '../models/measure'
 
 module.exports.fetch = (req, res, next, id) ->
 	Measure.find id, (err, measure) ->
-		if err or not measure
+		if err
+			res.send error: err, 500
+		else if not measure
 			res.send error: "Measure not found", 404
 		else
 			req.measure = measure
@@ -25,16 +27,17 @@ module.exports.read = (req, res) ->
 	res.send req.measure
 
 module.exports.update = (req, res) ->
-	data = req.body
+	res.send error: "Measures can't be updated", 401
+	###data = req.body
 	req.measure.update data, (err, measure) ->
-		if err?
-			res.send error: "Server error while saving measure", 500
+		if err
+			res.send error: err, 500
 		else
-			res.send measure, 200
+			res.send measure, 200###
 
 module.exports.delete = (req, res) ->
 	req.measure.destroy (err) ->
-		if err?
-			res.send error: "Server error while deleting measure", 500
+		if err
+			res.send error: err, 500
 		else
 			res.send success: true, 200
