@@ -22,6 +22,9 @@ module.exports =
 		actuatorId:	null
 		value: 		"BYE"
 
+	updateActuatorRule:
+		value: 		"HEY"
+
 	sensorRuleIsMoving:
 		ruleId:			null
 		sensorId:		null
