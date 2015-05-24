@@ -68,6 +68,17 @@ describe 'SensorRules Controller', ->
             expect(@body.id).to.exist
             store.sensorRuleId = @body.id
 
+        it 'should allow requests on the Rule (GET /rules/:ruleId)', (done) ->
+            @client.get "rules/#{store.rule.id}", done
+
+        it 'should reply with the Rule with an incremented number of SensorRules', ->
+            expect(@err).to.not.exist
+            expect(@response.statusCode).to.equal 200
+            expect(@body.id).to.equal store.rule.id
+            expect(@body.nbSensorRules).to.equal 1
+            expect(@body.nbSensorRulesMet).to.equal 0
+
+
     describe 'When we try creating a SensorRule (POST /rules/:ruleId/sensorRules) associated with an unknown Sensor', ->
 
         sensorRule = fixturesRule.sensorRuleIsMoving
@@ -136,7 +147,17 @@ describe 'SensorRules Controller', ->
             expect(@response.statusCode).to.equal 200
             expect(@body.success).to.equal true
 
-        it 'when we try getting the deleted sensorRule (GET /rule/:ruleId/sensorRules/:id)', (done) ->
+        it 'should allow requests on the parent Rule (GET /rules/:ruleId)', (done) ->
+            @client.get "rules/#{store.rule.id}", done
+
+        it 'should reply with the Rule with a decremented number of SensorRules', ->
+            expect(@err).to.not.exist
+            expect(@response.statusCode).to.equal 200
+            expect(@body.id).to.equal store.rule.id
+            expect(@body.nbSensorRules).to.equal 0
+            expect(@body.nbSensorRulesMet).to.equal 0
+
+        it 'should allow requests to try getting the deleted sensorRule (GET /rule/:ruleId/sensorRules/:id), but...', (done) ->
             @client.get "rules/#{store.rule.id}/sensorRules/#{store.sensorRuleId}", done
             
         it 'should return an error', ->
