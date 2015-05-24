@@ -39,11 +39,20 @@ module.exports.create = (req, res) ->
 
 module.exports.createMeasure = (req, res) ->
 	data = req.body
+	data.sensorId = req.sensor?.id
 	req.sensor.createMeasure data, (err, measure) ->
 		if err
 			res.send error: err, 500
 		else
 			res.send measure, 201
+
+module.exports.allMeasuresByTimeRange = (req, res) ->
+	Measure.allBySensorAndTimeRange req.sensor?.id, req.body.timeMin, req.body.timeMax, (err, measures) ->
+		if err
+			res.send error: err, 500
+		else
+			res.send measures, 200
+
 
 module.exports.update = (req, res) ->
 	data = req.body
