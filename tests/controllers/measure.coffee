@@ -104,6 +104,32 @@ describe 'Measures Controller', ->
             expect(@body).to.exist
             expect(@body.error).to.equal 'Measure not found'
 
+    describe 'When we get Measures given a Sensor and time interval (GET /sensors/:sensorId/measures?from=:minTime;to=maxTime)', ->
+        interval = measure = fixtureMeasure.intervalGetRequest
+
+        before (done) ->
+            measure = fixtureMeasure.measureMovement2
+            @client.post "sensors/#{measure.sensorId}/measures", measure, done
+
+        before (done) ->
+            measure = fixtureMeasure.measureMovement3
+            @client.post "sensors/#{measure.sensorId}/measures", measure, done
+
+        it 'should allow requests', (done) ->
+            @client.get "sensors/#{store.rule.id}/measures?from=#{interval.minTime.toISOString()};to=#{interval.maxTime.toISOString()}", done
+
+        it 'should reply with the corresponding measures', ->
+            expect(@err).to.not.exist
+            expect(@response.statusCode).to.equal 200
+            expect(@body).to.have.length(2)
+            expect(@body[0].type).to.equal fixtureMeasure.measureMovement1.type
+            expect(@body[0].value).to.equal fixtureMeasure.measureMovement1.value
+            expect(@body[0].time).to.equal fixtureMeasure.measureMovement1.time
+            expect(@body[0].id).to.equal store.measureId
+            expect(@body[1].type).to.equal fixtureMeasure.measureMovement1.type
+            expect(@body[1].value).to.equal fixtureMeasure.measureMovement1.value
+            expect(@body[1].time).to.equal fixtureMeasure.measureMovement1.time
+
     describe 'When we update a measure (PUT /sensors/:sensorId/measures/:id)', ->
 
         it 'should allow requests', (done) ->
