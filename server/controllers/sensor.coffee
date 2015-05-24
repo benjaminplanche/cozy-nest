@@ -47,7 +47,7 @@ module.exports.createMeasure = (req, res) ->
 			res.send measure, 201
 
 module.exports.allMeasuresByTimeRange = (req, res) ->
-	Measure.allBySensorAndTimeRange req.sensor?.id, req.body.timeMin, req.body.timeMax, (err, measures) ->
+	Measure.allBySensorAndTimeRange req.sensor?.id, req.query?.from, req.query?.to, (err, measures) ->
 		if err
 			res.send error: err, 500
 		else

@@ -23,12 +23,6 @@ module.exports =
     'driverId':       param: driver.fetch
     'sensorRuleId':   param: sensorRule.fetch
     'actuatorRuleId': param: actuatorRule.fetch
-    'minTime':        param: (req, res, next, val) ->
-        req.minTime = new Date(val)
-        next()
-    'maxTime':        param: (req, res, next, val) ->
-        req.maxTime = new Date(val)
-        next()  
 
     'sensors/?':
         get: sensor.all
