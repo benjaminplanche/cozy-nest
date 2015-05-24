@@ -16,12 +16,13 @@ actuatorRule	= require './actuatorRule'
 module.exports =
 
     # Fetch on params
-    'sensorId': 	param: sensor.fetch
-    'actuatorId': 	param: actuator.fetch
-    'ruleId': 		param: rule.fetch
-    'measureId':    param: measure.fetch
-    'driverId':     param: driver.fetch
-    'sensorRuleId': param: sensorRule.fetch
+    'sensorId': 	  param: sensor.fetch
+    'actuatorId': 	  param: actuator.fetch
+    'ruleId': 		  param: rule.fetch
+    'measureId':      param: measure.fetch
+    'driverId':       param: driver.fetch
+    'sensorRuleId':   param: sensorRule.fetch
+    'actuatorRuleId': param: actuatorRule.fetch 
 
     'sensors/?':
         get: sensor.all
@@ -62,15 +63,18 @@ module.exports =
         post: rule.createSensorRule
 
     'rules/:ruleId/sensorRules/:sensorRuleId?':
-        # @todo Get by Rule: get: sensor.getSensorRules
         get: sensorRule.read
         put: sensorRule.update
         delete: rule.deleteSensorRule
-    
 
     'rules/:ruleId/actuatorRules/?':
         # @todo Get by Rule: get: sensor.getActuatorRules
         post: rule.createActuatorRule
+
+    'rules/:ruleId/actuatorRules/:actuatorRuleId?':
+        get: actuatorRule.read
+        put: actuatorRule.update
+        delete: actuatorRule.delete
 
     'rules/?':
         get: rule.all
