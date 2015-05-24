@@ -22,7 +22,13 @@ module.exports =
     'measureId':      param: measure.fetch
     'driverId':       param: driver.fetch
     'sensorRuleId':   param: sensorRule.fetch
-    'actuatorRuleId': param: actuatorRule.fetch 
+    'actuatorRuleId': param: actuatorRule.fetch
+    'minTime':        param: (req, res, next, val) ->
+        req.minTime = new Date(val)
+        next()
+    'maxTime':        param: (req, res, next, val) ->
+        req.maxTime = new Date(val)
+        next()  
 
     'sensors/?':
         get: sensor.all
@@ -31,6 +37,12 @@ module.exports =
     'sensors/:sensorId/measures?':
         # @todo Get by Sensor + Date (opt): get: sensor.getMeasuresByDate
         post: sensor.createMeasure
+        get: sensor.allMeasuresByTimeRange
+
+    'sensors/:sensorId/measures/:measureId?':
+        get: measure.read
+        put: measure.update
+        delete: measure.delete
 
     'sensors/:sensorId/?':
         get: sensor.read
