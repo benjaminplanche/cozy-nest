@@ -6,6 +6,7 @@
 ###
 
 Sensor = require '../models/sensor'
+Measure = require '../models/measure'
 
 module.exports.fetch = (req, res, next, id) ->
 	Sensor.find id, (err, sensor) ->
