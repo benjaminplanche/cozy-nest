@@ -82,7 +82,7 @@ module.exports = class Sensor extends cozydb.CozyModel
 	###
 	createMeasure: (data, callback) ->
 		data.sensorId = @id
-		Measure.create data callback
+		Measure.create data, callback
 	
 	
 	###
