@@ -1,0 +1,13 @@
+.row
+	.large-12.columns
+		h3 Existing rules
+		hr
+		fieldset#rulesToDelete
+			legend Rules
+			each rule in rules
+				.row
+					form.deleteRule(method="delete", idRule=rule.id, action="/rules/"+rule.id)
+						.large-7.columns
+							p= rule.name
+						.large-5.columns
+							button.button.tiny(type="submit") Delete
