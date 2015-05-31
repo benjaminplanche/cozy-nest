@@ -49,7 +49,7 @@ describe 'Measures Controller', ->
             done null
 
         it 'should allow requests', (done) ->
-            @client.post "sensors/#{store.rule.id}/measures", measure, done
+            @client.post "sensors/#{store.sensor.id}/measures", measure, done
 
         it 'should reply with the created Measure', ->
             expect(@err).to.not.exist
@@ -57,7 +57,7 @@ describe 'Measures Controller', ->
             expect(@body.sensorId).to.equal measure.sensorId
             expect(@body.type).to.equal measure.type
             expect(@body.value).to.equal measure.value
-            expect(@body.time).to.equal measure.time
+            expect(@body.time).to.equal measure.time.toISOString()
             expect(@body.id).to.exist
             store.measureId = @body.id
 
@@ -81,7 +81,7 @@ describe 'Measures Controller', ->
     describe 'When we get a Measure (GET /sensors/:sensorId/measures/:id) which exists', ->
 
         it 'should allow requests', (done) ->
-            @client.get "sensors/#{store.rule.id}/measures/#{store.measureId}", done
+            @client.get "sensors/#{store.sensor.id}/measures/#{store.measureId}", done
 
         it 'should reply with the corresponding measure', ->
             expect(@err).to.not.exist
@@ -89,7 +89,7 @@ describe 'Measures Controller', ->
             expect(@body.sensorId).to.equal store.sensor.id
             expect(@body.type).to.equal fixtureMeasure.measureMovement1.type
             expect(@body.value).to.equal fixtureMeasure.measureMovement1.value
-            expect(@body.time).to.equal fixtureMeasure.measureMovement1.time
+            expect(@body.time).to.equal fixtureMeasure.measureMovement1.time.toISOString()
             expect(@body.id).to.equal store.measureId
 
             
@@ -97,7 +97,7 @@ describe 'Measures Controller', ->
         
         it 'should allow requests', (done) ->
             id = store.measureId + 404 # since "store.measureId" is the only correct ID in DB, "store.measureId + 404" is not.
-            @client.get "sensors/#{store.rule.id}/measures/#{id}", done
+            @client.get "sensors/#{store.sensor.id}/measures/#{id}", done
 
         it 'should return an error', ->
             expect(@response.statusCode).to.equal 404
@@ -109,31 +109,32 @@ describe 'Measures Controller', ->
 
         before (done) ->
             measure = fixtureMeasure.measureMovement2
+            measure.sensorId = store.sensor.id
             @client.post "sensors/#{measure.sensorId}/measures", measure, done
 
         before (done) ->
             measure = fixtureMeasure.measureMovement3
+            measure.sensorId = store.sensor.id
             @client.post "sensors/#{measure.sensorId}/measures", measure, done
 
         it 'should allow requests', (done) ->
-            @client.get "sensors/#{store.rule.id}/measures?from=#{interval.minTime.toISOString()};to=#{interval.maxTime.toISOString()}", done
+            @client.get "sensors/#{store.sensor.id}/measures?from=#{interval.minTime.toISOString()};to=#{interval.maxTime.toISOString()}", done
 
         it 'should reply with the corresponding measures', ->
             expect(@err).to.not.exist
             expect(@response.statusCode).to.equal 200
             expect(@body).to.have.length(2)
-            expect(@body[0].type).to.equal fixtureMeasure.measureMovement1.type
-            expect(@body[0].value).to.equal fixtureMeasure.measureMovement1.value
-            expect(@body[0].time).to.equal fixtureMeasure.measureMovement1.time
-            expect(@body[0].id).to.equal store.measureId
-            expect(@body[1].type).to.equal fixtureMeasure.measureMovement1.type
-            expect(@body[1].value).to.equal fixtureMeasure.measureMovement1.value
-            expect(@body[1].time).to.equal fixtureMeasure.measureMovement1.time
+            expect(@body[0].type).to.equal fixtureMeasure.measureMovement2.type
+            expect(@body[0].value).to.equal fixtureMeasure.measureMovement2.value
+            expect(@body[0].time).to.equal fixtureMeasure.measureMovement2.time.toISOString()
+            expect(@body[1].type).to.equal fixtureMeasure.measureMovement3.type
+            expect(@body[1].value).to.equal fixtureMeasure.measureMovement3.value
+            expect(@body[1].time).to.equal fixtureMeasure.measureMovement3.time.toISOString()
 
     describe 'When we update a measure (PUT /sensors/:sensorId/measures/:id)', ->
 
         it 'should allow requests', (done) ->
-            @client.put "sensors/#{store.rule.id}/measures/#{store.measureId}", fixtureMeasure.updateMeasure, done
+            @client.put "sensors/#{store.sensor.id}/measures/#{store.measureId}", fixtureMeasure.updateMeasure, done
 
         it 'should return an unauthorized error', ->
             expect(@err).to.not.exist
@@ -144,7 +145,7 @@ describe 'Measures Controller', ->
     describe 'When we delete a Measure (DELETE /sensors/:sensorId/measures/:id)', ->
 
         it 'should allow requests', (done) ->
-            @client.del "sensors/#{store.rule.id}/measures/#{store.measureId}", done
+            @client.del "sensors/#{store.sensor.id}/measures/#{store.measureId}", done
 
         it 'should return a "success"', ->
             expect(@err).to.not.exist
@@ -152,7 +153,7 @@ describe 'Measures Controller', ->
             expect(@body.success).to.equal true
 
         it 'should allow requests to try getting the deleted measure (GET /rule/:sensorId/measures/:id), but...', (done) ->
-            @client.get "sensors/#{store.rule.id}/measures/#{store.measureId}", done
+            @client.get "sensors/#{store.sensor.id}/measures/#{store.measureId}", done
             
         it 'should return an error', ->
             expect(@response.statusCode).to.equal 404
