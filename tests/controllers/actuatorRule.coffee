@@ -92,7 +92,7 @@ describe 'ActuatorRules Controller', ->
             expect(@response.statusCode).to.equal 200
             expect(@body.ruleId).to.equal store.rule.id
             expect(@body.actuatorId).to.equal store.actuator.id
-            expect(@body.value).to.equal actuatorRule.value
+            expect(@body.value).to.equal fixturesRule.actuatorRuleSayHello.value
             expect(@body.id).to.equal store.actuatorRuleId
 
             
