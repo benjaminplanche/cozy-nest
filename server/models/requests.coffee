@@ -8,7 +8,7 @@ cozydb = require 'cozydb'
 
 
 byCustomIdAndDriver = (doc) -> emit [doc.customId, doc.driverId], doc
-bySensorAndTime = (doc) -> emit [doc.sensorId, doc.time], doc
+bySensorAndTime = (doc) -> emit [doc.sensorId + doc.time], doc
 bySensorAndType = (doc) -> emit [doc.sensorId, doc.type], doc
 bySensor = (doc) -> emit doc.sensorId, doc
 byActuator = (doc) -> emit doc.actuatorId, doc
