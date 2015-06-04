@@ -1,0 +1,15 @@
+form#newSensorRule(method='post', action='/rules/#{rule.id}/sensorRules')
+      .row
+            .large-4.columns
+                  label(for='sensorId') Sensor
+                  select#sensorRuleSensor(type='text', name='sensorId', placeholder='Target Sensor')
+                        each sensor in sensors
+                              option(value=sensor.id)= sensor.name
+            .large-4.columns
+                  label(for='type') Type
+                  input#sensorRuleType(type='text', name='type', placeholder='Target Type of Measures')
+            .large-4.columns
+                  label(for='intervalStart') Measures Interval
+                  input#sensorRuleMinIntervalStart(type='text', name='intervalStart', placeholder='Min Value (leave empty if no min.)')
+                  input#sensorRuleMinIntervalEnd(type='text', name='intervalEnd', placeholder='Max Value (leave empty if no max.)')
+            button.button.tiny.success(type='submit') Add
