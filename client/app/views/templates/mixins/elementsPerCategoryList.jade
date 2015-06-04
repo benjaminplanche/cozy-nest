@@ -1,0 +1,32 @@
+- var sortElementsPerAttribute = function(elements, attr) {
+- 	var elementsPerAttr = [];
+- 	var idxAttr = {};
+- 	for (var i in elements) {
+- 		var categ = elements[i][attr];
+- 		var formatAttr = categ.toString().replace(/\W+/g, "-"); // Making sure we have a proper HTML ID.
+- 		if (!idxAttr.hasOwnProperty(formatAttr)) {
+- 			idxAttr[formatAttr] = elementsPerAttr.length;
+- 			elementsPerAttr.push({name: categ, formattedAttr: formatAttr, devices: []});
+- 		}
+- 		elementsPerAttr[idxAttr[formatAttr]].devices.push(elements[i]);
+- 	}
+- 	elementsPerAttr.sort(function(a, b){ return (a.formattedAttr < b.formattedAttr)? -1 : (a.formattedAttr > b.formattedAttr)? 1 : 0; });
+- 	return elementsPerAttr;
+- }
+
+mixin elementsPerCategoryList(devices, sortAttribute)
+	- var devicesPerAttr = sortElementsPerAttribute(devices, sortAttribute)
+	ul.collapsible(data-collapsible="expandable")
+		each data in devicesPerAttr
+			.collapsible-header
+				i.mdi-navigation-more-vert
+				data.name
+			.collapsible-body
+				.collection
+					each device in data.devices
+						a.collection-item.avatar
+							i.circle.mdi-action-input
+							.title= device.name
+							p= device.driver.name
+							.secondary-content
+								i.mdi-content-send
