@@ -1,0 +1,12 @@
+include ./mixins/deviceHeader.jade
+
+.sensor
+	+deviceHeader(sensor)		
+	.row
+		.col.s2
+			ul
+				li #[em Driver:] #[a(href="/drivers/#{sensor.driver.id}") #{sensor.driver.name}]
+				li #[em.tooltipped(data-position="left", data-delay="50", data-tooltip="ID used by the Driver to identify the device") Custom ID:] #{sensor.customId}
+	
+		
+	
