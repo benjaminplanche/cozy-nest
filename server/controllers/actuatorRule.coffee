@@ -29,7 +29,7 @@ module.exports.read = (req, res) ->
 module.exports.update = (req, res) ->
 	# @todo Prevent from updating ruleId and sensorId (or verify consistency of new ones)
 	data = req.body
-	req.actuatorRule.update data, (err, actuatorRule) ->
+	req.actuatorRule.updateAttributes data, (err, actuatorRule) ->
 		if err
 			res.send error: err, 500
 		else

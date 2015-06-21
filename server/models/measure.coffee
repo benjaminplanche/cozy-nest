@@ -10,13 +10,12 @@ cozydb = require 'cozydb'
 module.exports = class Measure extends cozydb.CozyModel
 	@schema:
 		time:		type : Date			# not Empty
-		value: 		type : Number		# not Empty
+		value: 		type : String		# not Empty
 		type: 		type : String		# not Empty
 		sensorId:	type : String		# not Empty
 	
 	@allBySensorAndTimeRange: (sensorId, timeMin, timeMax, callback) ->
 		params =
-			startkey: [sensorId, timeMin ? new Date(0)]
-			endkey: [sensorId, timeMax ? Date.now()]
-			descending: true
-		MeasureModel.request "bySensorAndTime", params, callback
+			startkey: [sensorId + timeMin]
+			endkey: [sensorId + timeMax]
+		@request "bySensorAndTime", params, callback
