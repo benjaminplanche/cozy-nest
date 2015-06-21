@@ -1,0 +1,15 @@
+include ./mixins/deviceHeader.jade
+
+.actuator
+	+deviceHeader(actuator)		
+	.row
+		.col.s2
+			.row
+				.col.s1
+					em Driver:
+				.col.s1
+					a(href="/drivers/#{actuator.driver.id}")= actuator.driver.name
+			.row
+				.col.s1
+					em.tooltipped(data-position="left", data-delay="50", data-tooltip="ID used by the Driver to identify the device") Custom ID:
+				.col.s1= actuator.customId
