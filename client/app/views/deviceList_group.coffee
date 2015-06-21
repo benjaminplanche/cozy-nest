@@ -12,6 +12,8 @@ module.exports = class DeviceListGroup extends ViewCollection
     
     initialize: ->
         super
+        @collection.comparator = (device) ->
+            return device.get "name"
     
     checkIfEmpty: =>
         # @$('.help').toggle _.size(@views) is 0 and app.mode is 'public'
@@ -21,3 +23,13 @@ module.exports = class DeviceListGroup extends ViewCollection
     
     getRenderData: ->
         return name: @name
+    
+    appendView: (view) ->
+        # Ensuring lexical sorting:
+        index = @collection.indexOf view.model
+        previous = @collection.at(index - 1)
+        previousView  = previous?.view
+        if index == 0 or !previous or !previousView
+            @$collectionEl.append view.el
+        else
+            $(previousView.el).after view.el
