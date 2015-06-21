@@ -1,0 +1,29 @@
+include ./mixins/elementsPerCategoryList.jade
+
+.devices
+	.row
+		.col.s3
+			ul.tabs
+				li.tab.col.s1
+					a(href="#sensorsList") Sensors
+				li.tab.col.s1
+					a(href="#actuatorsList") Actuators
+				li.tab.col.s1
+					a(href="#driversList") Drivers
+
+		.col.s2.offset-s7
+			button.button.tiny
+				i.mdi-action-add
+	.row
+		//- Devices navbar
+		.col.s3
+			#sensorsList
+			
+			#actuatorsList
+			
+			#driversList
+
+		//- Selected device's details
+		.col.s9
+			//- Template sensorProfil.jade goes here
+		

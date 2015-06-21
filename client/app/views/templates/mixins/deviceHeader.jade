@@ -1,0 +1,9 @@
+mixin deviceHeader(name, driverName, driverURL)
+	.row
+		.col.s10
+			h2 #{name}  #[small (#[a(href=driverURL) #{driverName}])]
+		.col.s2.right-align
+			button.button.tiny
+				i.mdi-action-delete
+			button.button.tiny
+				i.mdi-editor-mode-edit

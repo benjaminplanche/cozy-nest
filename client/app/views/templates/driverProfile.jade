@@ -1,0 +1,16 @@
+.driver
+	.row
+		.col.s10
+			h2= driver.name
+		.col.s2.right-align
+			button.button.tiny
+				i.mdi-action-delete
+			button.button.tiny
+				i.mdi-editor-mode-edit	
+	.row
+		.col.s2
+			.row
+				.col.s1
+					em Directory:
+				.col.s1
+					a(href="#")= driver.getDirectory()

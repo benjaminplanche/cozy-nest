@@ -1,0 +1,15 @@
+include ./mixins/deviceHeader.jade
+
+.sensor		
+	+deviceHeader(name, driverName, driverURL)		
+	.row
+		.col.s2
+			.row
+				.col.s1
+					em Driver:
+				.col.s1
+					a(href=driverURL)= driverName
+			.row
+				.col.s1
+					em.tooltipped(data-position="left", data-delay="50", data-tooltip="ID used by the Driver to identify the device") Custom ID:
+				.col.s1= customId
