@@ -10,5 +10,9 @@ module.exports = class Actuator extends Backbone.RelationalModel
 	urlRoot: 'actuators'
 
     defaults: ->
-        customId: 	''
-		name: 		''
+        customId: 	'Undefined'
+		name: 		'Undefined'
+		url:		'actuators/'
+		
+	getURL: ->
+		return "actuators/#{@id}"
