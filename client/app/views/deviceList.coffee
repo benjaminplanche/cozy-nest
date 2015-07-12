@@ -6,7 +6,7 @@ module.exports = class DeviceList extends ViewCollection
     itemView: require 'views/deviceList_category'
     template: require 'templates/deviceList'
     
-    collectionEl: null
+    collectionEl: '.collapsible'
     
     groupingAttribute: null
     
