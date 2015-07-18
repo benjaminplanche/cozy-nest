@@ -1,6 +1,8 @@
 gulp = require 'gulp'
-# browserify = require 'browserify'
-# buffer = require 'vinyl-buffer'
+browserify = require 'browserify'
+buffer = require 'vinyl-buffer'
+concat = require 'gulp-concat'
+babelify = require 'babelify'
 gutil = require 'gulp-util'
 coffee = require 'gulp-coffee'
 clean = require 'gulp-clean'
@@ -27,32 +29,40 @@ gulp.task 'default', ['b']
 gulp.task 'b' , ['build-client', 'build-server']	# build
 gulp.task 't' , ['test-client', 'test-server']		# test
 
-	 
-gulp.task 'build-client', () ->
+gulp.task 'client-remove-dir', () ->
+    return rm(BUILDDIR + 'client/')
+
+
+gulp.task 'client-bundle-css', () ->
+    return gulp.src('client/css/**/*')
+     .pipe(concat 'main.css')
+     .pipe(gulp.dest(BUILDDIR + 'client/css'))
+
+
+gulp.task 'client-copy-static', () ->
+    return gulp.src('static/**/*')
+     .pipe(gulp.dest(BUILDDIR + 'client/'))
+    
+
+
+gulp.task 'client-bundle-vendor', () ->
+    return gulp.src('client/vendor/**/*')
+     .pipe(concat 'vendor.js' )
+     .pipe(gulp.dest(BUILDDIR + 'client/js'))
+
+
+gulp.task 'build-client', ['client-remove-dir', 'client-copy-static', 'client-bundle-vendor', 'client-bundle-css'], () ->
 	logger.options.prefix = 'gulp:build-client'
 	logger.info "Start compilation..."
 
-	# rm BUILDDIR + 'client/' 
+    bundler = browserify entries: ['./client/main.js'], debug: true
 
-	# gulp.src 'static/**/*'
-	 # .pipe gulp.dest BUILDDIR + 'client/'
-	
-	# bundler = browserify {
-		# entries: ['./client/main.js'],
-		# debug: true
-	
-	# bundler
-	 # .transform babelify
-	 # .bundle 
-		# .on 'error', (err) ->
-			# logger.error 'Bundle error: ' + err 
-			# this.end 
-		
-	 # .pipe source 'main.js'
-	 # .pipe buffer 
-	 # .pipe gulp.dest BUILDDIR + 'client/js'
-	 
-	logger.error "No gulp-task defined yet."
+    bundler
+     .transform(babelify.configure optional: ['runtime'] )
+     .bundle().on('error', gutil.log)
+     .pipe(source 'main.js' )
+     .pipe(buffer())
+     .pipe(gulp.dest(BUILDDIR + 'client/js'))
 
 	logger.info "Compilation succeeded."
 
@@ -64,11 +74,11 @@ gulp.task 'build-server', () ->
 	rm [BUILDDIR + 'server/', 'server.js']
 
 	gulp.src('server/**/*.coffee')
-	 .pipe(coffee({bare: true}).on('error', gutil.log))
+	 .pipe(coffee( bare: true ).on('error', gutil.log))
 	 .pipe(gulp.dest BUILDDIR + 'server/')
 	
 	gulp.src('server.coffee')
-	 .pipe(coffee({bare: true}).on('error', gutil.log))
+	 .pipe(coffee( bare: true ).on('error', gutil.log))
 	 .pipe(gulp.dest BUILDDIR)
 
 	gulp.src('package.json')
@@ -94,7 +104,7 @@ gulp.task 'test-server', () ->
 	logger.info "Start testing server..."
 	
 	gulp.src ['tests/controllers/*.coffee'], read: false
-	 .pipe(mocha({reporter: 'spec'}).on('error', gutil.log))
+	 .pipe(mocha( reporter: 'spec' ).on('error', gutil.log))
 
 	logger.info "Testing server done."
 
