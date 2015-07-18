@@ -30,39 +30,39 @@ gulp.task 'b' , ['build-client', 'build-server']	# build
 gulp.task 't' , ['test-client', 'test-server']		# test
 
 gulp.task 'client-remove-dir', () ->
-    return rm(BUILDDIR + 'client/')
+	return rm(BUILDDIR + 'client/')
 
 
 gulp.task 'client-bundle-css', () ->
-    return gulp.src('client/css/**/*')
-     .pipe(concat 'main.css')
-     .pipe(gulp.dest(BUILDDIR + 'client/css'))
+	return gulp.src('client/css/**/*')
+	 .pipe(concat 'main.css')
+	 .pipe(gulp.dest(BUILDDIR + 'client/css'))
 
 
 gulp.task 'client-copy-static', () ->
-    return gulp.src('static/**/*')
-     .pipe(gulp.dest(BUILDDIR + 'client/'))
-    
+	return gulp.src('static/**/*')
+	 .pipe(gulp.dest(BUILDDIR + 'client/'))
+	
 
 
 gulp.task 'client-bundle-vendor', () ->
-    return gulp.src('client/vendor/**/*')
-     .pipe(concat 'vendor.js' )
-     .pipe(gulp.dest(BUILDDIR + 'client/js'))
+	return gulp.src('client/vendor/**/*')
+	 .pipe(concat 'vendor.js' )
+	 .pipe(gulp.dest(BUILDDIR + 'client/js'))
 
 
 gulp.task 'build-client', ['client-remove-dir', 'client-copy-static', 'client-bundle-vendor', 'client-bundle-css'], () ->
 	logger.options.prefix = 'gulp:build-client'
 	logger.info "Start compilation..."
 
-    bundler = browserify entries: ['./client/main.js'], debug: true
+	bundler = browserify entries: ['./client/main.js'], debug: true
 
-    bundler
-     .transform(babelify.configure optional: ['runtime'] )
-     .bundle().on('error', gutil.log)
-     .pipe(source 'main.js' )
-     .pipe(buffer())
-     .pipe(gulp.dest(BUILDDIR + 'client/js'))
+	bundler
+	 .transform(babelify.configure optional: ['runtime'] )
+	 .bundle().on('error', gutil.log)
+	 .pipe(source 'main.js' )
+	 .pipe(buffer())
+	 .pipe(gulp.dest(BUILDDIR + 'client/js'))
 
 	logger.info "Compilation succeeded."
 
