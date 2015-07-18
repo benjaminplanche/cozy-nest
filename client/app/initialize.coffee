@@ -1,7 +1,7 @@
-app = require 'application'
+app = require './application'
 
 # The function called from index.html
 $ ->
-    require 'lib/app_helpers'
+    require './lib/app_helpers'
 
     app.initialize()

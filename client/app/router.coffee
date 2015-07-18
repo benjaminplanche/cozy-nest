@@ -1,4 +1,4 @@
-AppView = require 'views/app_view'
+AppView = require './views/app_view'
 
 module.exports = class Router extends Backbone.Router
 

@@ -5,7 +5,7 @@ module.exports =
         #SocketListener = require '../lib/socket_listener'
 
         # Routing management
-        Router = require 'router'
+        Router = require './router'
         @router = new Router()
         Backbone.history.start()
 
