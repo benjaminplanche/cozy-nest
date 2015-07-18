@@ -48,23 +48,19 @@ gulp.task 'client-copy-static', () ->
 gulp.task 'client-bundle-vendor', () ->
 	return gulp.src('client/vendor/**/*')
 	 .pipe(concat 'vendor.js' )
-	 .pipe(gulp.dest(BUILDDIR + 'client/js'))
+	 .pipe(gulp.dest(BUILDDIR + 'client/javascript'))
 
 
 gulp.task 'build-client', ['client-remove-dir', 'client-copy-static', 'client-bundle-vendor', 'client-bundle-css'], () ->
 	logger.options.prefix = 'gulp:build-client'
 	logger.info "Start compilation..."
 
-	bundler = browserify entries: ['./client/main.js'], debug: true
-
-	bundler
-	 .transform(babelify.configure optional: ['runtime'] )
+	browserify( entries: ['./client/app/initialize.coffee'], extensions: ['.coffee'], debug: true )
+	 .transform('jadeify')
+	 .transform('coffeeify')
 	 .bundle().on('error', gutil.log)
-	 .pipe(source 'main.js' )
-	 .pipe(buffer())
-	 .pipe(gulp.dest(BUILDDIR + 'client/js'))
-
-	logger.info "Compilation succeeded."
+	 .pipe(source 'app.js' )
+	 .pipe(gulp.dest(BUILDDIR + 'client/javascript'))
 
 
 gulp.task 'build-server', () ->
@@ -83,8 +79,6 @@ gulp.task 'build-server', () ->
 
 	gulp.src('package.json')
 	 .pipe(gulp.dest BUILDDIR)
-
-	logger.info "Compilation succeeded."
 
 
 
