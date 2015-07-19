@@ -40,27 +40,27 @@ gulp.task 'client-bundle-css', () ->
 
 
 gulp.task 'client-copy-static', () ->
-	return gulp.src('static/**/*')
+	return gulp.src(['client/vendor/assets/**/*', 'client/app/assets/**/*'])
 	 .pipe(gulp.dest(BUILDDIR + 'client/'))
 	
 
 
 gulp.task 'client-bundle-vendor', () ->
-	return gulp.src('client/vendor/**/*')
+	return gulp.src('client/vendor/javascripts/*')
 	 .pipe(concat 'vendor.js' )
-	 .pipe(gulp.dest(BUILDDIR + 'client/javascript'))
+	 .pipe(gulp.dest(BUILDDIR + 'client/javascripts'))
 
 
 gulp.task 'build-client', ['client-remove-dir', 'client-copy-static', 'client-bundle-vendor', 'client-bundle-css'], () ->
 	logger.options.prefix = 'gulp:build-client'
 	logger.info "Start compilation..."
 
-	browserify( entries: ['./client/app/initialize.coffee'], extensions: ['.coffee'], debug: true )
+	browserify( entries: ['./client/app/initialize.coffee'], extensions: ['.coffee', '.jade'], debug: true )
 	 .transform('jadeify')
 	 .transform('coffeeify')
 	 .bundle().on('error', gutil.log)
 	 .pipe(source 'app.js' )
-	 .pipe(gulp.dest(BUILDDIR + 'client/javascript'))
+	 .pipe(gulp.dest(BUILDDIR + 'client/javascripts'))
 
 
 gulp.task 'build-server', () ->
